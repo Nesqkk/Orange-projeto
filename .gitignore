@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+.expo/
+mobile/.expo/
+mobile/dist/
+*.tsbuildinfo
+.env*
+!.env.example
