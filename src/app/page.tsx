@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, Check, Menu, Moon, Sparkles, Sun, X } from "lucide-react";
+import { ArrowRight, Check, Menu, Moon, Sun, X, Sparkles } from "lucide-react";
 import StaggerTestimonials from "@/components/orange/StaggerTestimonials";
-import NfcIdeaCarousel from "@/components/orange/NfcIdeaCarousel";
-import StoryCardsCarousel from "@/components/orange/StoryCardsCarousel";
 
 // Os valores são fictícios e servem somente como exemplo visual.
 const plans = [
@@ -43,21 +41,15 @@ export default function Home() {
 
       {/* Header reduzido: somente o símbolo da marca, navegação essencial e tema. */}
       <header className="navbar">
-        <a className="brand brand-symbol-only brand-reveal" href="#inicio" aria-label="Orange — início">
+        <a className="brand brand-symbol-only" href="#inicio" aria-label="Orange — início">
           <Image src="/orange-logo.png" alt="Símbolo da Orange" width={44} height={44} priority />
-          <span className="brand-reveal-text" aria-hidden="true">
-            {["o", "r", "a", "n", "g", "e"].map((letter, index) => (
-              <span className="brand-letter" key={`${letter}-${index}`}>{letter}</span>
-            ))}
-            <span className="brand-letter brand-dot">.</span>
-          </span>
         </a>
         <nav className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Navegação principal">
           <a href="#conceito" onClick={() => setMenuOpen(false)}>A experiência</a>
           <a href="#beneficios" onClick={() => setMenuOpen(false)}>Benefícios</a>
           <a href="#planos" onClick={() => setMenuOpen(false)}>Planos</a>
           <a href="#avaliacoes" onClick={() => setMenuOpen(false)}>Avaliações</a>
-          <a className="nav-cta" href="#planos" onClick={() => setMenuOpen(false)}><span>Ver planos</span><ArrowRight size={15} /></a>
+          <a className="nav-cta" href="#planos" onClick={() => setMenuOpen(false)}>Ver planos <ArrowRight size={15} /></a>
         </nav>
         <div className="nav-actions">
           <button className="theme-toggle" onClick={() => setLight(!light)} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
@@ -76,7 +68,7 @@ export default function Home() {
           <h1>O lado mais <span>vivo</span><br />da sua rotina.</h1>
           <p className="hero-description">Laranja de verdade. Sabor que desperta. Uma experiência feita pra quem quer sentir a diferença em cada gole.</p>
           <div className="hero-actions">
-            <a className="button button-orange" href="#planos"><span>Descubra Orange</span><ArrowRight size={17} /></a>
+            <a className="button button-orange" href="#planos">Descubra Orange <ArrowRight size={17} /></a>
           </div>
         </div>
 
@@ -84,6 +76,7 @@ export default function Home() {
           <div className="visual-orbit orbit-a" />
           <div className="visual-orbit orbit-b" />
           <div className="orange-glow" />
+          <div className="floating-label label-top"><Sparkles size={14} /> 100% natural</div>
           <div className="bottle-stage">
             <div className="bottle-cap" />
             <div className="bottle-neck" />
@@ -107,6 +100,7 @@ export default function Home() {
 
       {/* Seção de conceito: explica a proposta da marca em três ideias simples. */}
       <section className="story section-shell" id="conceito">
+        <div className="section-kicker">01 / A EXPERIÊNCIA</div>
         <div className="story-grid">
           <h2>Não é só suco.<br /><span>É sentir o agora.</span></h2>
           <div className="story-text">
@@ -114,22 +108,39 @@ export default function Home() {
             <a className="underlined-link" href="#beneficios">Conheça nosso jeito <ArrowRight size={16} /></a>
           </div>
         </div>
-        <StoryCardsCarousel />
+        <div className="story-cards">
+          <article className="story-card card-orange">
+            <div className="card-number">01</div>
+            <div className="fruit-symbol">✳</div>
+            <h3>Fruta de verdade.</h3>
+            <p>Suco de laranja 100% natural, com sabor fresco e sem enrolação.</p>
+            <span className="card-caption">SIMPLES ASSIM</span>
+          </article>
+          <article className="story-card card-dark">
+            <div className="card-number">02</div>
+            <div className="circle-art"><span>O</span></div>
+            <h3>Design com propósito.</h3>
+            <p>Uma garrafa pensada pra acompanhar seu ritmo — e voltar pro ciclo.</p>
+            <span className="card-caption">MENOS DESCARTE</span>
+          </article>
+          <article className="story-card card-cream">
+            <div className="card-number">03</div>
+            <div className="spark-art">✦</div>
+            <h3>Um cuidado a mais.</h3>
+            <p>Uma opção com colágeno pra quem quer explorar novas possibilidades.</p>
+            <span className="card-caption">VOCÊ ESCOLHE</span>
+          </article>
+        </div>
       </section>
 
       {/* Benefícios em lista para manter a leitura objetiva. */}
       <section className="benefits section-shell" id="beneficios">
-        <div className="benefit-heading nfc-feature-heading">
-          <div className="nfc-copy">
-            <h2>A garrafa Orange<br /><span>vai se conectar por NFC.</span></h2>
-            <p>Cada garrafa terá um chip NFC. Aproxime um celular compatível para abrir a experiência digital da Orange vinculada ao produto.</p>
-            <div className="nfc-how-it-works">
-              <span className="nfc-how-icon" aria-hidden="true">↗</span>
-              <span><strong>É só aproximar.</strong><br />Sem procurar um código ou endereço.</span>
-            </div>
-            <small className="nfc-footnote">A experiência e as funcionalidades serão apresentadas no lançamento.</small>
+        <div className="benefit-heading">
+          <div>
+            <div className="section-kicker">02 / POR QUE ORANGE?</div>
+            <h2>Pequenas escolhas.<br /><span>Boa energia.</span></h2>
           </div>
-          <NfcIdeaCarousel />
+          <p>Seu ritual de frescor ficou mais gostoso — e mais consciente.</p>
         </div>
         <div className="benefit-list">
           <article><span className="benefit-icon">✳</span><div><h3>Natural de verdade</h3><p>O sabor da laranja como ele deve ser: vivo, cítrico e direto ao ponto.</p></div><span className="benefit-arrow"><ArrowRight /></span></article>
@@ -142,6 +153,7 @@ export default function Home() {
       {/* Planos com preços de demonstração e benefícios essenciais. */}
       <section className="plan-section section-shell" id="planos">
         <div className="plan-heading">
+          <div className="section-kicker">01 / ESCOLHA SEU ORANGE</div>
           <span className="fictional-prices">PREÇOS FICTÍCIOS · ESTUDO DE LAYOUT</span>
           <h2>Seu próximo gole<br /><span>começa aqui.</span></h2>
           <p>Sem complicação. Escolha o formato que combina com você.</p>
@@ -156,7 +168,7 @@ export default function Home() {
               <div className="plan-divider" />
               <ul>{plan.perks.map((perk) => <li key={perk}><Check size={15} />{perk}</li>)}</ul>
               <a className={plan.featured ? "button button-orange plan-button" : "button button-outline plan-button"} href={`mailto:oi@orange.com.br?subject=${encodeURIComponent(`Quero conhecer o plano ${plan.name}`)}`}>
-                <span>Tenho interesse</span><ArrowRight size={16} />
+                Tenho interesse <ArrowRight size={16} />
               </a>
             </article>
           ))}
@@ -168,6 +180,7 @@ export default function Home() {
       <section className="reviews-section section-shell" id="avaliacoes">
         <div className="reviews-top">
           <div>
+            <div className="section-kicker">02 / QUEM JÁ SENTIU</div>
             <h2>Uma experiência Orange.<br /><span>Em demonstração.</span></h2>
           </div>
         </div>
