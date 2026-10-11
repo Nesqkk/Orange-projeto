@@ -57,15 +57,114 @@ export default function Home() {
         <a href="#conceito" className="scroll-cue"><span>SCROLL PRA SENTIR</span><ChevronDown size={16} /></a>
       </section>
 
-      <section className="marquee" aria-label="Manifesto Orange"><div className="marquee-track">{Array.from({ length: 4 }).map((_, i) => <span key={i}>FRUTA DE VERDADE <b>✳</b> FRESCOR SEM FILTRO <b>✳</b> SEU DIA, MAIS VIVO <b>✳</b></span>)}</div></section>
-
-      <section className="story section-shell" id="conceito"><div className="section-kicker">01 / A EXPERIÊNCIA</div><div className="story-grid"><h2>Não é só suco.<br /><span>É sentir o agora.</span></h2><div className="story-text"><p>A Orange nasceu de uma ideia simples: deixar o natural ser extraordinário. Sem complicar o que já é bom — só fruta, frescor e um jeito mais inteligente de consumir.</p><a className="underlined-link" href="#beneficios">Conheça nosso jeito <ArrowRight size={16} /></a></div></div><div className="story-cards"><article className="story-card card-orange"><div className="card-number">01</div><div className="fruit-symbol">✳</div><h3>Fruta de verdade.</h3><p>Suco de laranja 100% natural, com sabor fresco e sem enrolação.</p><span className="card-caption">SIMPLES ASSIM</span></article><article className="story-card card-dark"><div className="card-number">02</div><div className="circle-art"><span>O</span></div><h3>Design com propósito.</h3><p>Uma garrafa pensada pra acompanhar seu ritmo — e voltar pro ciclo.</p><span className="card-caption">MENOS DESCARTE</span></article><article className="story-card card-cream"><div className="card-number">03</div><div className="spark-art">✦</div><h3>Um cuidado a mais.</h3><p>Uma opção com colágeno pra quem quer explorar novas possibilidades.</p><span className="card-caption">VOCÊ ESCOLHE</span></article></div></section>
-
+     <section className="story section-shell" id="conceito">
+        <div className="section-kicker">01 / A EXPERIÊNCIA</div>
+        <div className="story-grid">
+          <h2>Não é só suco.<br /><span>É sentir o agora.</span></h2>
+          <div className="story-text">
+            <p>A Orange nasceu de uma ideia simples: deixar o natural ser extraordinário. Sem complicar o que já é bom — só fruta, frescor e um jeito mais inteligente de consumir.</p>
+            <a className="underlined-link" href="#beneficios">Conheça nosso jeito <ArrowRight size={16} /></a>
+          </div>
+        </div>
+        <div className="story-cards" style={{ gap: "24px" }}>
+          <article className="story-card card-orange" style={{ borderRadius: "36px", padding: "32px 24px", textAlign: "center" }}>
+            <div className="card-number">01</div>
+            <div className="fruit-symbol">✳</div>
+            <h3>Fruta de verdade.</h3>
+            <p>Suco de laranja 100% natural, com sabor fresco e sem enrolação.</p>
+            <span className="card-caption">SIMPLES ASSIM</span>
+          </article>
+          <article className="story-card card-dark" style={{ borderRadius: "36px", padding: "32px 24px", textAlign: "center" }}>
+            <div className="card-number">02</div>
+            <div className="circle-art"><span>O</span></div>
+            <h3>Design com propósito.</h3>
+            <p>Uma garrafa pensada pra acompanhar seu ritmo — e voltar pro ciclo.</p>
+            <span className="card-caption">MENOS DESCARTE</span>
+          </article>
+          <article className="story-card card-cream" style={{ borderRadius: "36px", padding: "32px 24px", textAlign: "center" }}>
+            <div className="card-number">03</div>
+            <div className="spark-art">✦</div>
+            <h3>Um cuidado a mais.</h3>
+            <p>Uma opção com colágeno pra quem quer explorar novas possibilidades.</p>
+            <span className="card-caption">VOCÊ ESCOLHE</span>
+          </article>
+        </div>
+      </section>
       <section className="benefits section-shell" id="beneficios"><div className="benefit-heading"><div><div className="section-kicker">02 / POR QUE ORANGE?</div><h2>Pequenas escolhas.<br /><span>Boa energia.</span></h2></div><p>Seu ritual de frescor ficou mais gostoso — e mais consciente.</p></div><div className="benefit-list"><article><span className="benefit-icon">✳</span><div><h3>Natural de verdade</h3><p>O sabor da laranja como ele deve ser: vivo, cítrico e direto ao ponto.</p></div><span className="benefit-arrow"><ArrowRight /></span></article><article><span className="benefit-icon">↻</span><div><h3>Devolveu, ganhou</h3><p>Devolva sua garrafa e receba cashback. Seu próximo Orange começa aqui.</p></div><span className="benefit-arrow"><ArrowRight /></span></article><article><span className="benefit-icon">⌁</span><div><h3>Seu ritmo, suas regras</h3><p>Escolha comprar quando quiser ou deixar seu estoque chegar com uma assinatura.</p></div><span className="benefit-arrow"><ArrowRight /></span></article><article><span className="benefit-icon">◉</span><div><h3>Conectada com você</h3><p>A tecnologia NFC aproxima a garrafa da sua experiência digital.</p></div><span className="benefit-arrow"><ArrowRight /></span></article></div></section>
 
-      <section className="plan-section section-shell" id="planos"><div className="plan-heading"><div className="section-kicker">03 / ESCOLHA SEU ORANGE</div><span className="fictional-prices">PREÇOS FICTÍCIOS · ESTUDO DE LAYOUT</span><h2>Seu próximo gole<br /><span>começa aqui.</span></h2><p>Sem complicação. Escolha o formato que combina com você.</p></div><div className="plans-grid">{plans.map((plan, i) => <article className={`plan-card ${plan.featured ? "featured" : ""}`} key={plan.name}>{plan.featured && <div className="popular-tag">O FAVORITO <Sparkles size={13} /></div>}<div className="plan-topline"><span>{plan.name}</span><span>0{i + 1}</span></div><p className="plan-description">{plan.description}</p><div className="plan-price">{plan.amount}<small>{plan.detail}</small></div><div className="plan-divider"/><ul>{plan.perks.map(perk => <li key={perk}><Check size={15} />{perk}</li>)}</ul><a className={plan.featured ? "button button-orange plan-button" : "button button-outline plan-button"} href={`mailto:oi@orange.com.br?subject=${encodeURIComponent(`Quero conhecer o plano ${plan.name}`)}`}>Tenho interesse <ArrowRight size={16} /></a></article>)}</div><p className="plan-note">* Todos os preços desta página são fictícios e servem apenas como exemplo visual. Não representam uma oferta comercial real.</p></section>
+      <section className="plan-section section-shell" id="planos">
+        <div className="plan-heading">
+          <div className="section-kicker">03 / ESCOLHA SEU ORANGE</div>
+          <span className="fictional-prices">PREÇOS FICTÍCIOS · ESTUDO DE LAYOUT</span>
+          <h2>Seu próximo gole<br /><span>começa aqui.</span></h2>
+          <p>Sem complicação. Escolha o formato que combina com você.</p>
+        </div>
 
-      <section className="reviews-section section-shell" id="avaliacoes"><div className="reviews-top"><div><div className="section-kicker">04 / QUEM JÁ SENTIU</div><h2>Uma experiência Orange.<br /><span>Em demonstração.</span></h2></div><div className="review-controls"><button onClick={() => setActiveReview((activeReview + reviews.length - 1) % reviews.length)} aria-label="Avaliação anterior">←</button><button onClick={() => setActiveReview((activeReview + 1) % reviews.length)} aria-label="Próxima avaliação">→</button></div></div><div className="review-feature"><div className="quote-mark">“</div><div className="review-content"><div className="stars"><Star /><Star /><Star /><Star /><Star /></div><blockquote>{reviews[activeReview].quote}</blockquote><div className="review-person"><div className="review-avatar">{reviews[activeReview].initials}</div><div><strong>{reviews[activeReview].name}</strong><span>{reviews[activeReview].role}</span></div></div></div><div className="review-pagination">0{activeReview + 1}<span />0{reviews.length}</div></div><p className="review-disclaimer">Avaliações fictícias usadas apenas para demonstrar o layout. Serão substituídas por depoimentos reais autorizados antes da publicação.</p></section>
+        <div className="plans-grid" style={{ alignItems: "center", gap: "28px" }}>
+          {plans.map((plan, i) => {
+            const isOrangeClub = plan.name.toLowerCase().includes("club") || plan.featured;
+
+            return (
+              <article 
+                className={`plan-card ${plan.featured ? "featured" : ""}`} 
+                key={plan.name}
+                style={{
+                  borderRadius: isOrangeClub ? "48px" : "36px",
+                  padding: isOrangeClub ? "42px 32px" : "32px 24px",
+                  transform: isOrangeClub ? "scale(1.08)" : "scale(1.0)",
+                  border: isOrangeClub ? "2px solid #ff6b00" : "1px solid rgba(255, 255, 255, 0.1)",
+                  boxShadow: isOrangeClub ? "0 20px 40px rgba(255, 107, 0, 0.25)" : "none",
+                  zIndex: isOrangeClub ? 2 : 1,
+                  transition: "all 0.3s ease",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center"
+                }}
+              >
+                {plan.featured && (
+                  <div className="popular-tag" style={{ borderRadius: "20px", padding: "6px 16px" }}>
+                    O FAVORITO <Sparkles size={13} />
+                  </div>
+                )}
+                
+                <div className="plan-topline" style={{ width: "100%", justifyContent: "space-between" }}>
+                  <span>{plan.name}</span>
+                  <span>0{i + 1}</span>
+                </div>
+
+                <p className="plan-description" style={{ marginTop: "12px" }}>{plan.description}</p>
+                
+                <div className="plan-price" style={{ margin: "20px 0", fontSize: isOrangeClub ? "2.2rem" : "1.8rem" }}>
+                  {plan.amount}<small>{plan.detail}</small>
+                </div>
+
+                <div className="plan-divider" style={{ width: "80%", margin: "0 auto 16px auto" }} />
+
+                <ul style={{ listStyle: "none", padding: 0, marginBottom: "24px", textAlign: "left", width: "100%" }}>
+                  {plan.perks.map(perk => (
+                    <li key={perk} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                      <Check size={15} />{perk}
+                    </li>
+                  ))}
+                </ul>
+
+                <a 
+                  className={plan.featured ? "button button-orange plan-button" : "button button-outline plan-button"} 
+                  href={`mailto:oi@orange.com.br?subject=${encodeURIComponent(`Quero conhecer o plano ${plan.name}`)}`}
+                  style={{ borderRadius: "24px", width: "100%", marginTop: "auto" }}
+                >
+                  Tenho interesse <ArrowRight size={16} />
+                </a>
+              </article>
+            );
+          })}
+        </div>
+
+        <p className="plan-note">
+          Todos os preços desta página são fictícios e servem apenas como exemplo visual. Não representam uma oferta comercial real.
+        </p>
+      </section>
 
       <section className="faq-section section-shell"><div><div className="section-kicker">SEM DÚVIDAS</div><h2>Quer saber<br /><span>mais alguma coisa?</span></h2></div><div className="faq-list">{[{q:"O suco é 100% natural?",a:"Sim. A proposta da Orange é oferecer suco de laranja 100% natural. Informações finais de ingredientes e conservação serão exibidas no rótulo do produto."},{q:"Como funciona a devolução da garrafa?",a:"A ideia é permitir a devolução em pontos participantes e oferecer cashback conforme as regras do programa, que serão publicadas no lançamento."},{q:"Qual é a diferença do Orange +?",a:"É uma versão opcional enriquecida com colágeno. A composição e as informações nutricionais estarão disponíveis na embalagem."}].map((item, i) => <article className={`faq-item ${faqOpen === i ? "faq-active" : ""}`} key={item.q}><button onClick={() => setFaqOpen(faqOpen === i ? null : i)}><span>{item.q}</span><span>{faqOpen === i ? "−" : "+"}</span></button>{faqOpen === i && <p>{item.a}</p>}</article>)}</div></section>
 
