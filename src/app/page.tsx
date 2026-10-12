@@ -94,7 +94,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <a href="#planos" className="scroll-cue"><span>SCROLL PRA SENTIR</span><span className="scroll-arrow">↓</span></a>
+       
       </section>
 
 
@@ -103,10 +103,6 @@ export default function Home() {
         <div className="section-kicker">01 / A EXPERIÊNCIA</div>
         <div className="story-grid">
           <h2>Não é só suco.<br /><span>É sentir o agora.</span></h2>
-          <div className="story-text">
-            <p>A Orange nasceu de uma ideia simples: deixar o natural ser extraordinário. Sem complicar o que já é bom — só fruta, frescor e um jeito mais inteligente de consumir.</p>
-            <a className="underlined-link" href="#beneficios">Conheça nosso jeito <ArrowRight size={16} /></a>
-          </div>
         </div>
         <div className="story-cards">
           <article className="story-card card-orange">
