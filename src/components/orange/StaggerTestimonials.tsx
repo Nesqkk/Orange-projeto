@@ -6,9 +6,9 @@ import MorphingPageDots from "./MorphingPageDots";
 
 // Depoimentos fictícios para demonstrar o layout. Substituir por relatos reais autorizados.
 const testimonials = [
-  { quote: "Finalmente um suco que tem gosto de fruta de verdade. Virou parte da minha manhã.", name: "Marina S.", role: "Cliente Orange Club", initials: "MS" },
-  { quote: "A garrafa é linda, o sistema de devolução é fácil e o suco é muito bom.", name: "Caio R.", role: "Cliente desde 2026", initials: "CR" },
-  { quote: "Curti a ideia de consumir melhor sem precisar mudar toda a minha rotina.", name: "Bia M.", role: "Cliente Orange+", initials: "BM" },
+  { quote: "É um sabor que vicia, sempre tomo enquanto tô trabalhando .", name: "EoTavin", role: "Cliente Orange Club", initials: "OG" },
+  { quote: "A garrafa é foda, o sistema de devolução é bem tranquilo de se usar.", name: "RONALDOOO_SIUU.", role: "Cliente desde 2026", initials: "CR" },
+  { quote: "Eu gosto da ideia do suco ser gostoso e bem natural.", name: "Kl4us", role: "Cliente Orange+", initials: "AK" },
 ];
 
 /** Carrossel de depoimentos com cartões sobrepostos e navegação por pontos. */

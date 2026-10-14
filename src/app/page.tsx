@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, Check, Menu, Moon, Sun, X, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Menu, Moon, Sun, X, Sparkles, Icon, Circle } from "lucide-react";
 import StaggerTestimonials from "@/components/orange/StaggerTestimonials";
 
 // Os valores são fictícios e servem somente como exemplo visual.
@@ -12,12 +12,46 @@ const plans = [
   { name: "Orange+", amount: "R$ 44,90", detail: "/ mês", description: "Mais cuidado na sua rotina.", perks: ["4 garrafas enriquecidas com colágeno", "Cashback na devolução", "Entrega recorrente"], featured: false },
 ];
 
+const storyCards = [
+  {
+    number: "01",
+    title: "Fruta de verdade.",
+    description: "Suco de laranja 100% natural, com sabor fresco e sem enrolação.",
+    caption: "SIMPLES ASSIM",
+    style: "card-orange",
+    artType: "Fruit",
+    artText: "✳"
+  }
+  ,
+  {
+    number: "02",
+    title: "Design com propósito.",
+    description: "Uma garrafa pensada pra acompanhar seu ritmo — e voltar pro ciclo.",
+    caption: "MENOS DESCARTE",
+    style: "card-dark",
+    artType: "circle",
+    artText: "O"
+  }
+  ,
+{
+  number: "03",
+  title: "Um cuidado a mais.",
+  description: "Uma opção com colágeno pra quem quer explorar novas possibilidades.",
+  caption: "VOCÊ ESCOLHE",
+  style: "card-cream",
+  artType: "spark",
+  artText: "✦"
+}
+]
+
 export default function Home() {
   const [light, setLight] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrollStage, setScrollStage] = useState(0);
+  const [activeCard, setActiveCard] = useState(0);
+   const currentCard = storyCards[activeCard];
   const themeClass = `${light ? "site light" : "site"} scroll-stage-${scrollStage}`;
-
+ 
   // Ajusta suavemente a atmosfera do fundo conforme a pessoa percorre a página.
   useEffect(() => {
     const updateStage = () => {
@@ -51,9 +85,9 @@ export default function Home() {
           <a href="#avaliacoes" onClick={() => setMenuOpen(false)}>Avaliações</a>
           <a className="nav-cta" href="#planos" onClick={() => setMenuOpen(false)}>Ver planos <ArrowRight size={15} /></a>
         </nav>
-        <div className="nav-actions">
+        <div className="toggle">
           <button className="theme-toggle" onClick={() => setLight(!light)} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
-            {light ? <Moon size={17} /> : <Sun size={17} />}
+            {light ? <Moon size={21} /> : <Sun size={21} />}
           </button>
           <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}>
             {menuOpen ? <X /> : <Menu />}
@@ -94,7 +128,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-       
       </section>
 
 
@@ -105,27 +138,33 @@ export default function Home() {
           <h2>Não é só suco.<br /><span>É sentir o agora.</span></h2>
         </div>
         <div className="story-cards">
-          <article className="story-card card-orange">
-            <div className="card-number">01</div>
-            <div className="fruit-symbol">✳</div>
-            <h3>Fruta de verdade.</h3>
-            <p>Suco de laranja 100% natural, com sabor fresco e sem enrolação.</p>
-            <span className="card-caption">SIMPLES ASSIM</span>
-          </article>
-          <article className="story-card card-dark">
-            <div className="card-number">02</div>
-            <div className="circle-art"><span>O</span></div>
-            <h3>Design com propósito.</h3>
-            <p>Uma garrafa pensada pra acompanhar seu ritmo — e voltar pro ciclo.</p>
-            <span className="card-caption">MENOS DESCARTE</span>
-          </article>
-          <article className="story-card card-cream">
-            <div className="card-number">03</div>
-            <div className="spark-art">✦</div>
-            <h3>Um cuidado a mais.</h3>
-            <p>Uma opção com colágeno pra quem quer explorar novas possibilidades.</p>
-            <span className="card-caption">VOCÊ ESCOLHE</span>
-          </article>
+          <article className ={`story-card ${currentCard.style}`}>
+            <h6>{currentCard.number}</h6>
+            {currentCard.artType === "Fruit" && (
+              <div className="fruit-symbol">
+                {currentCard.artText}
+              </div>
+              )}
+            {currentCard.artType === "circle" && (
+              <div className="circle-art">
+                {currentCard.artText}
+              </div>
+            )}
+            {currentCard.artType === "spark" && (
+              <div className="spark-art">
+              {currentCard.artText}
+              </div>
+            )}
+            <h3>{currentCard.title}</h3>
+            <p>{currentCard.description}</p>
+            <span className="card-caption">
+            {currentCard.caption}
+            
+            </span>
+            </article>
+            <button onClick={() => setActiveCard((activeCard + 1) % 3)}>
+               Próximo
+                </button>
         </div>
       </section>
 
