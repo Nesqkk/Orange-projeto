@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, Menu, Moon, Sun, X, Sparkles } from "lucide-react";
 import StaggerTestimonials from "@/components/orange/StaggerTestimonials";
+import LogoAnimada from "@/components/orange/LogoAnimada";
+
+// Garrafa 3D só no navegador (WebGL). Enquanto carrega, o espaço fica vazio e a entrada enche a garrafa.
+const GarrafaHero = dynamic(() => import("@/components/orange/GarrafaHero"), { ssr: false });
 
 // Os valores são fictícios e servem somente como exemplo visual.
 const plans = [
-  { name: "Solo", amount: "R$ 9,90", detail: "por garrafa", description: "Pra matar a sede de um jeito melhor.", perks: ["Suco 100% natural", "Laranja de verdade", "Embalagem retornável"], featured: false },
-  { name: "Orange Club", amount: "R$ 34,90", detail: "/ mês", description: "Sua dose de frescor, sem complicação.", perks: ["4 garrafas por mês", "Cashback na devolução", "Acesso a edições especiais"], featured: true },
-  { name: "Orange+", amount: "R$ 44,90", detail: "/ mês", description: "Mais cuidado na sua rotina.", perks: ["4 garrafas enriquecidas com colágeno", "Cashback na devolução", "Entrega recorrente"], featured: false },
+  { name: "Solo", amount: "R$ 9,90", detail: "por garrafa", description: "Pra matar a sede de um jeito melhor.", perks: ["Suco 100% natural", "Laranja de verdade", "Embalagem retornável"], featured: false },
+  { name: "Orange Club", amount: "R$ 34,90", detail: "/ mês", description: "Sua dose de frescor, sem complicação.", perks: ["4 garrafas por mês", "Cashback na devolução", "Acesso a edições especiais"], featured: true },
+  { name: "Orange+", amount: "R$ 44,90", detail: "/ mês", description: "Mais cuidado na sua rotina.", perks: ["4 garrafas enriquecidas com colágeno", "Cashback na devolução", "Entrega recorrente"], featured: false },
 ];
 
 type StoryCard = {
@@ -69,6 +74,7 @@ export default function Home() {
   const [light, setLight] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrollStage, setScrollStage] = useState(0);
+  const [stuck, setStuck] = useState(false);
   const [activeCard, setActiveCard] = useState(0);
   const currentCard = storyCards[activeCard];
   const themeClass = `${light ? "site light" : "site"} scroll-stage-${scrollStage}`;
@@ -79,6 +85,7 @@ export default function Home() {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
       setScrollStage(Math.min(4, Math.floor(progress * 5)));
+      setStuck(window.scrollY > 24);
     };
     updateStage();
     window.addEventListener("scroll", updateStage, { passive: true });
@@ -89,65 +96,76 @@ export default function Home() {
     };
   }, []);
 
+  // Lembra o tema escolhido; na primeira visita segue o tema do aparelho.
+  useEffect(() => {
+    try {
+      const salvo = localStorage.getItem("orange-tema");
+      if (salvo) setLight(salvo === "claro");
+      else setLight(matchMedia("(prefers-color-scheme: light)").matches);
+    } catch {}
+  }, []);
+
+  const alternarTema = () => {
+    const proximo = !light;
+    setLight(proximo);
+    try { localStorage.setItem("orange-tema", proximo ? "claro" : "escuro"); } catch {}
+  };
+
+  // Menu do celular fecha com Esc.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
   return (
-    <main className={themeClass}>
+    <div className={themeClass}>
+      <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
       <div className="ambient ambient-one" aria-hidden="true" />
       <div className="ambient ambient-two" aria-hidden="true" />
 
       {/* Header reduzido: somente o símbolo da marca, navegação essencial e tema. */}
-      <header className="navbar">
+      <header className={stuck ? "navbar is-stuck" : "navbar"}>
         <a className="brand brand-symbol-only" href="#inicio" aria-label="Orange — início">
-          <Image src="/orange-logo.png" alt="Símbolo da Orange" width={44} height={44} priority />
+          <LogoAnimada altura={44} />
         </a>
-        <nav className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Navegação principal">
+        <nav id="menu-principal" className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Navegação principal">
           <a href="#conceito" onClick={() => setMenuOpen(false)}>A experiência</a>
           <a href="#beneficios" onClick={() => setMenuOpen(false)}>Benefícios</a>
           <a href="#planos" onClick={() => setMenuOpen(false)}>Planos</a>
           <a href="#avaliacoes" onClick={() => setMenuOpen(false)}>Avaliações</a>
-          <a className="nav-cta" href="#planos" onClick={() => setMenuOpen(false)}>Ver planos <ArrowRight size={15} /></a>
+          <a className="nav-cta" href="#planos" onClick={() => setMenuOpen(false)}>Ver planos <ArrowRight size={15} aria-hidden="true" /></a>
         </nav>
         <div className="toggle">
-          <button className="theme-toggle" onClick={() => setLight(!light)} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
-            {light ? <Moon size={21} /> : <Sun size={21} />}
+          <button type="button" className="theme-toggle" onClick={alternarTema} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
+            {light ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
           </button>
-          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen}>
+          <button type="button" className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="menu-principal">
             {menuOpen ? <X /> : <Menu />}
           </button>
         </div>
       </header>
 
+      <main id="conteudo">
+
       {/* Hero enxuto: título, descrição curta e garrafa ilustrativa. */}
       <section className="hero section-shell minimal-hero" id="inicio">
         <div className="hero-copy">
-          <div className="eyebrow"><span className="eyebrow-dot" /> NATURALMENTE FORA DO ÓBVIO</div>
+          <div className="eyebrow"><span className="eyebrow-dot" aria-hidden="true" /> NATURALMENTE FORA DO ÓBVIO</div>
           <h1>O lado mais <span>vivo</span><br />da sua rotina.</h1>
           <p className="hero-description">Laranja de verdade. Sabor que desperta. Uma experiência feita pra quem quer sentir a diferença em cada gole.</p>
           <div className="hero-actions">
-            <a className="button button-orange" href="#planos">Descubra Orange <ArrowRight size={17} /></a>
+            <a className="button button-orange" href="#planos">Descubra Orange <ArrowRight size={17} aria-hidden="true" /></a>
           </div>
         </div>
 
-        <div className="hero-visual" role="img" aria-label="Garrafa Orange ilustrativa">
-          <div className="visual-orbit orbit-a" />
-          <div className="visual-orbit orbit-b" />
-          <div className="orange-glow" />
-          <div className="floating-label label-top"><Sparkles size={14} /> 100% natural</div>
-          <div className="bottle-stage">
-            <div className="bottle-cap" />
-            <div className="bottle-neck" />
-            <div className="bottle">
-              <div className="bottle-shine" />
-              <div className="bottle-liquid" />
-              <div className="bottle-label">
-                <span className="label-small">FRESHLY PRESSED</span>
-                <strong>orange<span>.</span></strong>
-                <i>PURE ORANGE JUICE</i>
-                <div className="label-fruit">◉</div>
-                <small>300 ml · sem mistério</small>
-              </div>
-              <div className="bottle-base" />
-            </div>
-          </div>
+        <div className="hero-visual">
+          <div className="visual-orbit orbit-a" aria-hidden="true" />
+          <div className="visual-orbit orbit-b" aria-hidden="true" />
+          <div className="orange-glow" aria-hidden="true" />
+          <div className="floating-label label-top"><Sparkles size={14} aria-hidden="true" /> 100% natural</div>
+          <GarrafaHero fallback={<GarrafaCss />} />
         </div>
       </section>
 
@@ -170,7 +188,7 @@ export default function Home() {
           {/* Dots com as mesmas classes do carrossel de avaliações. */}
           <div className="morphing-dots">
             <button type="button" onClick={() => setActiveCard((activeCard - 1 + storyCards.length) % storyCards.length)} aria-label="Card anterior">
-              <ChevronLeft size={16} />
+              <ChevronLeft size={16} aria-hidden="true" />
             </button>
             <div className="morphing-dots-list">
               {storyCards.map((card, index) => (
@@ -180,12 +198,12 @@ export default function Home() {
                   className={index === activeCard ? "morphing-dot active" : "morphing-dot"}
                   onClick={() => setActiveCard(index)}
                   aria-label={`Ver card ${card.number}`}
-                  aria-current={index === activeCard}
+                  aria-current={index === activeCard ? "true" : undefined}
                 />
               ))}
             </div>
             <button type="button" onClick={() => setActiveCard((activeCard + 1) % storyCards.length)} aria-label="Próximo card">
-              <ChevronRight size={16} />
+              <ChevronRight size={16} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -201,10 +219,10 @@ export default function Home() {
           <p>Seu ritual de frescor ficou mais gostoso — e mais consciente.</p>
         </div>
         <div className="benefit-list">
-          <article><span className="benefit-icon">✳</span><div><h3>Natural de verdade</h3><p>O sabor da laranja como ele deve ser: vivo, cítrico e direto ao ponto.</p></div><span className="benefit-arrow"><ArrowRight /></span></article>
-          <article><span className="benefit-icon">↻</span><div><h3>Devolveu, ganhou</h3><p>Devolva sua garrafa e receba cashback conforme as regras do programa.</p></div><span className="benefit-arrow"><ArrowRight /></span></article>
-          <article><span className="benefit-icon">⌁</span><div><h3>Seu ritmo, suas regras</h3><p>Compre quando quiser ou escolha uma assinatura recorrente.</p></div><span className="benefit-arrow"><ArrowRight /></span></article>
-          <article><span className="benefit-icon">◉</span><div><h3>Conectada com você</h3><p>A tecnologia NFC aproxima a garrafa da sua experiência digital.</p></div><span className="benefit-arrow"><ArrowRight /></span></article>
+          <article><span className="benefit-icon" aria-hidden="true">✳</span><div><h3>Natural de verdade</h3><p>O sabor da laranja como ele deve ser: vivo, cítrico e direto ao ponto.</p></div><span className="benefit-arrow" aria-hidden="true"><ArrowRight /></span></article>
+          <article><span className="benefit-icon" aria-hidden="true">↻</span><div><h3>Devolveu, ganhou</h3><p>Devolva sua garrafa e receba cashback conforme as regras do programa.</p></div><span className="benefit-arrow" aria-hidden="true"><ArrowRight /></span></article>
+          <article><span className="benefit-icon" aria-hidden="true">⌁</span><div><h3>Seu ritmo, suas regras</h3><p>Compre quando quiser ou escolha uma assinatura recorrente.</p></div><span className="benefit-arrow" aria-hidden="true"><ArrowRight /></span></article>
+          <article><span className="benefit-icon" aria-hidden="true">◉</span><div><h3>Conectada com você</h3><p>A tecnologia NFC aproxima a garrafa da sua experiência digital.</p></div><span className="benefit-arrow" aria-hidden="true"><ArrowRight /></span></article>
         </div>
       </section>
 
@@ -219,14 +237,14 @@ export default function Home() {
         <div className="plans-grid">
           {plans.map((plan, index) => (
             <article className={`plan-card ${plan.featured ? "featured" : ""}`} key={plan.name}>
-              {plan.featured && <div className="popular-tag">O FAVORITO <Sparkles size={13} /></div>}
+              {plan.featured && <div className="popular-tag">O FAVORITO <Sparkles size={13} aria-hidden="true" /></div>}
               <div className="plan-topline"><span>{plan.name}</span><span>0{index + 1}</span></div>
               <p className="plan-description">{plan.description}</p>
               <div className="plan-price">{plan.amount}<small>{plan.detail}</small></div>
               <div className="plan-divider" />
-              <ul>{plan.perks.map((perk) => <li key={perk}><Check size={15} />{perk}</li>)}</ul>
+              <ul>{plan.perks.map((perk) => <li key={perk}><Check size={15} aria-hidden="true" />{perk}</li>)}</ul>
               <a className={plan.featured ? "button button-orange plan-button" : "button button-outline plan-button"} href={`mailto:oi@orange.com.br?subject=${encodeURIComponent(`Quero conhecer o plano ${plan.name}`)}`}>
-                Tenho interesse <ArrowRight size={16} />
+                Tenho interesse <ArrowRight size={16} aria-hidden="true" />
               </a>
             </article>
           ))}
@@ -246,7 +264,7 @@ export default function Home() {
       </section>
 
       {/* Perguntas frequentes em formato expansível. */}
-      <section className="faq-section section-shell">
+      <section className="faq-section section-shell" id="duvidas">
         <div>
           <div className="section-kicker">SEM DÚVIDAS</div>
           <h2>Quer saber<br /><span>mais alguma coisa?</span></h2>
@@ -268,22 +286,45 @@ export default function Home() {
         <div className="closing-glow" aria-hidden="true" />
         <div className="section-kicker">O NATURAL PODE IR MAIS LONGE</div>
         <h2>Deixa o dia<br />mais <span>Orange.</span></h2>
-        <a className="button button-dark" href="#planos">Encontrar meu Orange <ArrowRight size={17} /></a>
+        <a className="button button-dark" href="#planos">Encontrar meu Orange <ArrowRight size={17} aria-hidden="true" /></a>
         <div className="closing-fruit" aria-hidden="true">✳</div>
       </section>
+      </main>
 
       {/* Rodapé curto para encerrar a página sem adicionar outra chamada extensa. */}
       <footer className="footer section-shell">
         <div className="footer-main">
           <a className="brand brand-symbol-only" href="#inicio" aria-label="Voltar ao início"><Image src="/orange-logo.png" alt="Símbolo da Orange" width={38} height={38} /></a>
           <p>Fruta de verdade.<br />Uma vida mais viva.</p>
-          <a href="mailto:oi@orange.com.br">oi@orange.com.br <ArrowRight size={14} /></a>
+          <a href="mailto:oi@orange.com.br">oi@orange.com.br <ArrowRight size={14} aria-hidden="true" /></a>
         </div>
         <div className="footer-bottom">
           <span>© 2026 Orange. Feito com frescor.</span>
           <div><a href="#planos">Planos</a><a href="#avaliacoes">Avaliações</a><a href="#inicio">Voltar ao topo ↑</a></div>
         </div>
       </footer>
-    </main>
+    </div>
+  );
+}
+
+// Garrafa em CSS: aparece só se o aparelho não conseguir mostrar a 3D.
+function GarrafaCss() {
+  return (
+    <div className="bottle-stage" role="img" aria-label="Garrafa Orange ilustrativa">
+      <div className="bottle-cap" />
+      <div className="bottle-neck" />
+      <div className="bottle">
+        <div className="bottle-shine" />
+        <div className="bottle-liquid" />
+        <div className="bottle-label">
+          <span className="label-small">FRESHLY PRESSED</span>
+          <strong>orange<span>.</span></strong>
+          <i>PURE ORANGE JUICE</i>
+          <div className="label-fruit">◉</div>
+          <small>300 ml · sem mistério</small>
+        </div>
+        <div className="bottle-base" />
+      </div>
+    </div>
   );
 }
