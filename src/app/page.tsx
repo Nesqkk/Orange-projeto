@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, Check, Menu, Moon, Sun, X, Sparkles, Icon, Circle } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, Menu, Moon, Sun, X, Sparkles } from "lucide-react";
 import StaggerTestimonials from "@/components/orange/StaggerTestimonials";
 
 // Os valores são fictícios e servem somente como exemplo visual.
@@ -12,46 +12,67 @@ const plans = [
   { name: "Orange+", amount: "R$ 44,90", detail: "/ mês", description: "Mais cuidado na sua rotina.", perks: ["4 garrafas enriquecidas com colágeno", "Cashback na devolução", "Entrega recorrente"], featured: false },
 ];
 
-const storyCards = [
+type StoryCard = {
+  number: string;
+  title: string;
+  description: string;
+  caption: string;
+  style: "card-orange" | "card-dark" | "card-cream";
+  artType: "fruit" | "circle" | "spark";
+  artText: string;
+};
+
+// Classe CSS de cada tipo de arte decorativa do card.
+const artClass: Record<StoryCard["artType"], string> = {
+  fruit: "fruit-symbol",
+  circle: "circle-art",
+  spark: "spark-art",
+};
+
+const storyCards: StoryCard[] = [
   {
     number: "01",
     title: "Fruta de verdade.",
-    description: "Suco de laranja 100% natural, com sabor fresco e sem enrolação.",
+    description: "Só laranja espremida, sem água e sem açúcar adicionado. Um suco 100% natural, com o sabor fresco da fruta e nada de enrolação.",
     caption: "SIMPLES ASSIM",
     style: "card-orange",
-    artType: "Fruit",
-    artText: "✳"
-  }
-  ,
+    artType: "fruit",
+    artText: "✳",
+  },
   {
     number: "02",
     title: "Design com propósito.",
-    description: "Uma garrafa pensada pra acompanhar seu ritmo — e voltar pro ciclo.",
+    description: "Uma garrafa pensada pra acompanhar seu ritmo, do café da manhã ao fim do treino. Quando acabar, devolva: ela volta pro ciclo e você ganha cashback.",
     caption: "MENOS DESCARTE",
     style: "card-dark",
     artType: "circle",
-    artText: "O"
-  }
-  ,
-{
-  number: "03",
-  title: "Um cuidado a mais.",
-  description: "Uma opção com colágeno pra quem quer explorar novas possibilidades.",
-  caption: "VOCÊ ESCOLHE",
-  style: "card-cream",
-  artType: "spark",
-  artText: "✦"
-}
-]
+    artText: "O",
+  },
+  {
+    number: "03",
+    title: "Um cuidado a mais.",
+    description: "Quer ir além do suco? O Orange+ vem enriquecido com colágeno, pra quem quer explorar novas possibilidades sem mudar a rotina.",
+    caption: "VOCÊ ESCOLHE",
+    style: "card-cream",
+    artType: "spark",
+    artText: "✦",
+  },
+];
+
+const faqs = [
+  { q: "O suco é 100% natural?", a: "A proposta da Orange é oferecer suco de laranja 100% natural. As informações finais de ingredientes e conservação serão exibidas no rótulo." },
+  { q: "Como funciona a devolução da garrafa?", a: "A ideia é permitir a devolução em pontos participantes e oferecer cashback conforme as regras do programa, que serão publicadas no lançamento." },
+  { q: "Qual é a diferença do Orange+?", a: "É uma versão opcional enriquecida com colágeno. A composição e as informações nutricionais estarão disponíveis na embalagem." },
+];
 
 export default function Home() {
   const [light, setLight] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrollStage, setScrollStage] = useState(0);
   const [activeCard, setActiveCard] = useState(0);
-   const currentCard = storyCards[activeCard];
+  const currentCard = storyCards[activeCard];
   const themeClass = `${light ? "site light" : "site"} scroll-stage-${scrollStage}`;
- 
+
   // Ajusta suavemente a atmosfera do fundo conforme a pessoa percorre a página.
   useEffect(() => {
     const updateStage = () => {
@@ -89,7 +110,7 @@ export default function Home() {
           <button className="theme-toggle" onClick={() => setLight(!light)} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
             {light ? <Moon size={21} /> : <Sun size={21} />}
           </button>
-          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}>
+          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen}>
             {menuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -106,7 +127,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero-visual" aria-label="Garrafa Orange ilustrativa">
+        <div className="hero-visual" role="img" aria-label="Garrafa Orange ilustrativa">
           <div className="visual-orbit orbit-a" />
           <div className="visual-orbit orbit-b" />
           <div className="orange-glow" />
@@ -130,41 +151,43 @@ export default function Home() {
         </div>
       </section>
 
-
       {/* Seção de conceito: explica a proposta da marca em três ideias simples. */}
       <section className="story section-shell" id="conceito">
         <div className="section-kicker">01 / A EXPERIÊNCIA</div>
         <div className="story-grid">
           <h2>Não é só suco.<br /><span>É sentir o agora.</span></h2>
         </div>
-        <div className="story-cards">
-          <article className ={`story-card ${currentCard.style}`}>
-            <h6>{currentCard.number}</h6>
-            {currentCard.artType === "Fruit" && (
-              <div className="fruit-symbol">
-                {currentCard.artText}
-              </div>
-              )}
-            {currentCard.artType === "circle" && (
-              <div className="circle-art">
-                {currentCard.artText}
-              </div>
-            )}
-            {currentCard.artType === "spark" && (
-              <div className="spark-art">
+        <div className="story-cards is-carousel">
+          <article key={currentCard.number} className={`story-card ${currentCard.style}`} aria-live="polite">
+            <span className="card-number">{currentCard.number}</span>
+            <div className={artClass[currentCard.artType]} aria-hidden="true">
               {currentCard.artText}
-              </div>
-            )}
+            </div>
             <h3>{currentCard.title}</h3>
             <p>{currentCard.description}</p>
-            <span className="card-caption">
-            {currentCard.caption}
-            
-            </span>
-            </article>
-            <button onClick={() => setActiveCard((activeCard + 1) % 3)}>
-               Próximo
-                </button>
+            <span className="card-caption">{currentCard.caption}</span>
+          </article>
+          {/* Dots com as mesmas classes do carrossel de avaliações. */}
+          <div className="morphing-dots">
+            <button type="button" onClick={() => setActiveCard((activeCard - 1 + storyCards.length) % storyCards.length)} aria-label="Card anterior">
+              <ChevronLeft size={16} />
+            </button>
+            <div className="morphing-dots-list">
+              {storyCards.map((card, index) => (
+                <button
+                  type="button"
+                  key={card.number}
+                  className={index === activeCard ? "morphing-dot active" : "morphing-dot"}
+                  onClick={() => setActiveCard(index)}
+                  aria-label={`Ver card ${card.number}`}
+                  aria-current={index === activeCard}
+                />
+              ))}
+            </div>
+            <button type="button" onClick={() => setActiveCard((activeCard + 1) % storyCards.length)} aria-label="Próximo card">
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       </section>
 
@@ -188,7 +211,7 @@ export default function Home() {
       {/* Planos com preços de demonstração e benefícios essenciais. */}
       <section className="plan-section section-shell" id="planos">
         <div className="plan-heading">
-          <div className="section-kicker">01 / ESCOLHA SEU ORANGE</div>
+          <div className="section-kicker">03 / ESCOLHA SEU ORANGE</div>
           <span className="fictional-prices">PREÇOS FICTÍCIOS · ESTUDO DE LAYOUT</span>
           <h2>Seu próximo gole<br /><span>começa aqui.</span></h2>
           <p>Sem complicação. Escolha o formato que combina com você.</p>
@@ -215,13 +238,12 @@ export default function Home() {
       <section className="reviews-section section-shell" id="avaliacoes">
         <div className="reviews-top">
           <div>
-            <div className="section-kicker">02 / QUEM JÁ SENTIU</div>
+            <div className="section-kicker">04 / QUEM JÁ SENTIU</div>
             <h2>Uma experiência Orange.<br /><span>Em demonstração.</span></h2>
           </div>
         </div>
         <StaggerTestimonials />
       </section>
-
 
       {/* Perguntas frequentes em formato expansível. */}
       <section className="faq-section section-shell">
@@ -230,11 +252,7 @@ export default function Home() {
           <h2>Quer saber<br /><span>mais alguma coisa?</span></h2>
         </div>
         <div className="faq-list">
-          {[
-            { q: "O suco é 100% natural?", a: "A proposta da Orange é oferecer suco de laranja 100% natural. As informações finais de ingredientes e conservação serão exibidas no rótulo." },
-            { q: "Como funciona a devolução da garrafa?", a: "A ideia é permitir a devolução em pontos participantes e oferecer cashback conforme as regras do programa, que serão publicadas no lançamento." },
-            { q: "Qual é a diferença do Orange+?", a: "É uma versão opcional enriquecida com colágeno. A composição e as informações nutricionais estarão disponíveis na embalagem." },
-          ].map((item, index) => (
+          {faqs.map((item) => (
             <article className="faq-item" key={item.q}>
               <details>
                 <summary>{item.q}</summary>

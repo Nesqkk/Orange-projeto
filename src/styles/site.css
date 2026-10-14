@@ -338,7 +338,7 @@ button {
   .toggle {
   position: absolute;
   top: 50%;
-  right: -270px; /* Joga o botão para o lado direito extremo */
+  right: -490px; /* Joga o botão para o lado direito extremo */
   transform: translateY(-50%);
   display: flex;
   align-items: center;
@@ -544,54 +544,266 @@ button {
 }
 .story-text p, .benefit-heading > p, .plan-heading > p { font-size: 14px; line-height: 1.9; color: var(--muted); }
 
-.story-cards { 
-  display: grid; 
-  height: 250px;
+/* ===== Story cards (Orange) ===== */
 
+.story-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
   margin-top: 70px;
- }
+  /* sem height fixa: o container acompanha a altura dos cards */
+}
 
+.story-cards.is-carousel {
+  grid-template-columns: minmax(0, 440px);
+  justify-content: center;
+}
+.story-cards.is-carousel .story-card { animation: card-in .45s cubic-bezier(.2, .8, .2, 1); }
+@keyframes card-in { from { opacity: 0; transform: translateY(12px); } }
 .story-card {
-  height: 340px;
-  padding: 24px;
+  min-height: 380px;
+  padding: 28px;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  transition: transform .35s, border-color .35s, background-color .5s;
-  border-radius: 40px;
-}
-.story-card:hover { 
-  transform: translateY(-6px); 
-  grid-template-columns: repeat(1, 1fr);
+  border-radius: 32px;
+  border: 1px solid transparent;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 24px 48px -28px rgba(0, 0, 0, .7);
+  transition:
+    transform .5s cubic-bezier(.2, .8, .2, 1),
+    box-shadow .5s cubic-bezier(.2, .8, .2, 1),
+    border-color .35s;
 }
 
-.card-orange { background: var(--orange); color: #fff; }
-.card-dark { background: #151513; border: 1px solid var(--line); }
-.card-cream { background: #e8e1d2; color: #1a1712; }
+/* brilho suave que acende no hover */
+.story-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(80% 60% at 80% 0%, rgba(255, 255, 255, .18), transparent 70%);
+  opacity: 0;
+  transition: opacity .5s;
+}
 
-.card-number { position: absolute; top: 24px; left: 24px; font: 11px 'DM Mono', monospace; opacity: .65; }
-.fruit-symbol { position: absolute; top: 43px; right: 27px; font-size: 115px; line-height: 1; color: rgba(255, 255, 255, .26); animation: spin-slow 30s linear infinite; }
+.story-card:hover,
+.story-card:focus-within {
+  transform: translateY(-8px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .1),
+    0 36px 60px -30px rgba(0, 0, 0, .85);
+}
+.story-card:hover::before,
+.story-card:focus-within::before { opacity: 1; }
+
+/* ---- variações ---- */
+.card-orange {
+  background: radial-gradient(120% 90% at 85% 0%, #FF8A1F 0%, var(--orange, #FF6A00) 55%, #E85D00 100%);
+  color: #fff;
+}
+.card-dark {
+  background: linear-gradient(180deg, #1c1b18 0%, #121210 100%);
+  border-color: var(--line, rgba(255, 255, 255, .08));
+  color: #F4EEE6;
+}
+.card-dark::before {
+  background: radial-gradient(80% 60% at 50% 10%, rgba(255, 106, 0, .22), transparent 70%);
+}
+.card-dark:hover,
+.card-dark:focus-within { border-color: rgba(255, 106, 0, .45); }
+.card-cream {
+  background: linear-gradient(180deg, #FFF4E6 0%, #F6E6D0 100%);
+  color: #1a1712;
+}
+.card-cream::before {
+  background: radial-gradient(80% 60% at 85% 0%, rgba(255, 138, 31, .25), transparent 70%);
+}
+
+/* ---- elementos ---- */
+.card-number {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  padding: 5px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font: 500 11px/1 'DM Mono', monospace;
+  letter-spacing: 1px;
+  opacity: .6;
+}
+
+.fruit-symbol {
+  position: absolute;
+  top: 30px;
+  right: 22px;
+  z-index: -1;
+  font-size: 130px;
+  line-height: 1;
+  color: rgba(255, 255, 255, .24);
+  animation: spin-slow 30s linear infinite;
+}
+
 .circle-art {
   position: absolute;
-  top: 53px;
+  top: 44px;
   left: 50%;
   transform: translateX(-50%);
-  width: 140px;
-  height: 140px;
-  border: 1px solid #ff8b48;
+  z-index: -1;
+  width: 128px;
+  height: 128px;
+  border: 1px solid #FF8A1F;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: #ff8b48;
-  font: 800 80px 'Manrope', sans-serif;
-  box-shadow: 0 0 0 15px #ff6b180b, 0 0 0 30px #ff6b1807;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 106, 0, .16), transparent 70%);
+  color: #FF8A1F;
+  font: 800 72px/1 'Manrope', sans-serif;
+  box-shadow:
+    0 0 0 14px rgba(255, 106, 0, .06),
+    0 0 0 28px rgba(255, 106, 0, .03);
+  transition: box-shadow .6s cubic-bezier(.2, .8, .2, 1);
 }
-.spark-art { position: absolute; top: 35px; right: 30px; font-size: 115px; color: #f6a94c; transform: rotate(12deg); }
-.story-card h3 { font: 600 24px 'Manrope', sans-serif; letter-spacing: -1px; margin: 0 0 10px; position: relative; }
-.story-card p { font-size: 12px; line-height: 1.7; opacity: .73; max-width: 290px; margin: 0 0 20px; position: relative; }
-.card-caption { font: 9px 'DM Mono', monospace; letter-spacing: 1.4px; opacity: .6; }
+.story-card:hover .circle-art {
+  box-shadow:
+    0 0 0 18px rgba(255, 106, 0, .09),
+    0 0 0 38px rgba(255, 106, 0, .045);
+}
+
+.spark-art {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  z-index: -1;
+  font-size: 120px;
+  line-height: 1;
+  color: #FF8A1F;
+  transform: rotate(12deg);
+  transition: transform .6s cubic-bezier(.2, .8, .2, 1);
+}
+.story-card:hover .spark-art { transform: rotate(30deg) scale(1.06); }
+
+.story-card h3 {
+  font: 700 26px/1.15 'Manrope', sans-serif;
+  letter-spacing: -.02em;
+  text-wrap: balance;
+  margin: 0 0 10px;
+}
+
+.story-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: .78;
+  max-width: 32ch;
+  margin: 0 0 22px;
+}
+
+.card-caption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  font: 500 10px/1 'DM Mono', monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: .65;
+}
+.card-caption::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .story-cards { gap: 14px; margin-top: 48px; }
+  .story-card { min-height: 340px; padding: 24px; border-radius: 28px; }
+  .story-card h3 { font-size: 23px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-card,
+  .story-card::before,
+  .circle-art,
+  .spark-art { transition: none; }
+  .fruit-symbol { animation: none; }
+  .story-card:hover,
+  .story-card:focus-within { transform: none; }
+}
+
+/* ===== Story cards: modo carrossel (um card grande por vez) =====
+   Cole depois do bloco dos story cards, substituindo o trecho
+   .story-cards.is-carousel que eu tinha passado antes. */
+
+.story-cards.is-carousel {
+  grid-template-columns: minmax(0, 820px);
+  justify-content: center;
+  gap: 24px;
+}
+
+.story-cards.is-carousel .story-card {
+  min-height: 500px;
+  padding: 44px;
+  border-radius: 44px;
+  animation: card-in .45s cubic-bezier(.2, .8, .2, 1);
+}
+
+.story-cards.is-carousel .card-number { top: 36px; left: 36px; font-size: 12px; padding: 6px 12px; }
+
+.story-cards.is-carousel .story-card h3 {
+  font-size: clamp(34px, 4.4vw, 52px);
+  letter-spacing: -.035em;
+  line-height: 1.05;
+  max-width: 14ch;
+  margin-bottom: 16px;
+}
+
+.story-cards.is-carousel .story-card p {
+  font-size: 17px;
+  line-height: 1.6;
+  max-width: 44ch;
+  margin-bottom: 28px;
+}
+
+.story-cards.is-carousel .card-caption { font-size: 11px; max-width: 44ch; }
+
+/* artes maiores, presas no canto superior direito */
+.story-cards.is-carousel .fruit-symbol { font-size: 260px; top: 24px; right: 36px; }
+.story-cards.is-carousel .spark-art { font-size: 230px; top: 28px; right: 48px; }
+.story-cards.is-carousel .circle-art {
+  top: 56px;
+  left: auto;
+  right: 64px;
+  transform: none;
+  width: 190px;
+  height: 190px;
+  font-size: 108px;
+}
+
+@keyframes card-in { from { opacity: 0; transform: translateY(12px); } }
+
+@media (max-width: 900px) {
+  .story-cards.is-carousel .circle-art { right: 40px; width: 150px; height: 150px; font-size: 84px; }
+}
+
+@media (max-width: 680px) {
+  .story-cards.is-carousel .story-card { min-height: 480px; padding: 26px; border-radius: 32px; }
+  .story-cards.is-carousel .card-number { top: 24px; left: 24px; }
+  .story-cards.is-carousel .story-card h3 { font-size: 32px; }
+  .story-cards.is-carousel .story-card p { font-size: 15px; }
+  .story-cards.is-carousel .fruit-symbol { font-size: 150px; top: 20px; right: 18px; }
+  .story-cards.is-carousel .spark-art { font-size: 130px; top: 22px; right: 24px; }
+  .story-cards.is-carousel .circle-art { top: 30px; right: 30px; width: 120px; height: 120px; font-size: 68px; }
+}
+
 
 /* =========================================================
    7. BENEFÍCIOS
