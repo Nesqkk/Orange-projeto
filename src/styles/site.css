@@ -9,7 +9,7 @@ Links de navegação: .nav-links
 
 Botão de CTA principal do menu: .nav-cta
 
-Botão do tema (Claro/Escuro): .theme-toggle
+Botão do tema (Claro/Escuro), fixo fora da navbar no canto direito: .theme-toggle
 
 Botão de menu para dispositivos móveis: .menu-toggle
 
@@ -62,9 +62,9 @@ Seção geral: .benefits
 
 Cabeçalho explicativo: .benefit-heading
 
-Lista de vantagens: .benefit-list, .benefit-list article
+Grade de vantagens (sem linhas divisórias): .benefit-list, .benefit-list article
 
-Ícones e setas interativas: .benefit-icon, .benefit-arrow
+Ícones: .benefit-icon
 
 5. Planos e Assinaturas (<section id="planos">)
 Seção geral: .plan-section
@@ -109,7 +109,7 @@ Botões escuros: .button-dark
 Rodapé principal: .footer, .footer-main, .footer-bottom
 
 9. Estilos Globais, Animações e Responsividade
-Variáveis de tema (Dark/Light): :root, .site, .site.light, .site.scroll-stage-*
+Variáveis de tema (Dark/Light): :root, .site, .site.light (progressão do laranja via --scroll-progress)
 
 Animações (@keyframes): bottle-float, glow, liquid-wave, marquee, scroll-down, spin-slow
 
@@ -204,8 +204,18 @@ p { text-wrap: pretty; }
   position: relative;
   /* clip (e não hidden) corta o brilho lateral sem quebrar o header sticky */
   overflow-x: clip;
-  transition: background-color .75s ease, color .35s ease;
-  --scroll-glow: rgba(255, 107, 24, .10);
+  transition: color .35s ease;
+
+  /* Progressão do laranja: --scroll-progress vai de 0 (topo) a 1 (fim da página),
+     atualizado continuamente pelo page.tsx. O fundo mistura a cor base com uma
+     versão "aquecida" e o brilho cresce em força e tamanho. */
+  --scroll-progress: 0;
+  --bg-base: #070707;
+  --bg-warm: #2b1206;
+  --glow-from: 14%;
+  --glow-to: 48%;
+  --bg: color-mix(in srgb, var(--bg-warm) calc(var(--scroll-progress) * 100%), var(--bg-base));
+  --scroll-glow: color-mix(in srgb, var(--orange) calc(var(--glow-from) + (var(--glow-to) - var(--glow-from)) * var(--scroll-progress)), transparent);
 }
 
 .site::before {
@@ -214,30 +224,22 @@ p { text-wrap: pretty; }
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at 78% 16%, var(--scroll-glow), transparent 42%);
-  transition: background 1s ease;
+  background:
+    radial-gradient(ellipse at 78% 16%, var(--scroll-glow), transparent calc(42% + 18% * var(--scroll-progress))),
+    radial-gradient(ellipse at 12% 100%, var(--scroll-glow), transparent calc(20% + 35% * var(--scroll-progress)));
 }
 
 .site.light {
-  --bg: #f4f1e9;
+  --bg-base: #f4f1e9;
+  --bg-warm: #fad2ab;
+  --glow-from: 16%;
+  --glow-to: 42%;
   --panel: #fffdf7;
   --panel-2: #eae5d9;
   --text: #171510;
   --muted: #6d6a61;
   --line: rgba(20, 18, 13, .16);
 }
-
-.site.scroll-stage-0 { --bg: #070707; --scroll-glow: rgba(255, 107, 24, .13); }
-.site.scroll-stage-1 { --bg: #0c0908; --scroll-glow: rgba(255, 107, 24, .20); }
-.site.scroll-stage-2 { --bg: #100a08; --scroll-glow: rgba(186, 62, 18, .20); }
-.site.scroll-stage-3 { --bg: #0b0b09; --scroll-glow: rgba(255, 138, 36, .16); }
-.site.scroll-stage-4 { --bg: #100b08; --scroll-glow: rgba(255, 107, 24, .24); }
-
-.site.light.scroll-stage-0 { --bg: #f4f1e9; --scroll-glow: rgba(255, 155, 65, .18); }
-.site.light.scroll-stage-1 { --bg: #f5eee5; --scroll-glow: rgba(255, 125, 36, .22); }
-.site.light.scroll-stage-2 { --bg: #f2e8df; --scroll-glow: rgba(209, 94, 46, .15); }
-.site.light.scroll-stage-3 { --bg: #f4f0e7; --scroll-glow: rgba(255, 181, 85, .2); }
-.site.light.scroll-stage-4 { --bg: #f8eee2; --scroll-glow: rgba(255, 123, 31, .2); }
 
 .light .card-dark {
   background: #e8e2d5;
@@ -407,6 +409,22 @@ p { text-wrap: pretty; }
   transition: border-color .2s, color .2s, background-color .2s;
 }
 .theme-toggle svg { width: 18px; height: 18px; }
+
+/* Tema fora da navbar: fixo no canto direito, alinhado ao centro vertical da navbar.
+   A navbar fica um pouco mais estreita para nunca encostar no botão. */
+.navbar { width: min(1240px, calc(100% - 180px)); }
+.theme-toggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 11;
+  width: 46px;
+  height: 46px;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 12px 40px -18px rgba(0, 0, 0, .55);
+}
 @media (hover: hover) {
   .theme-toggle:hover, .menu-toggle:hover { border-color: var(--orange); color: var(--orange); }
 }
@@ -886,32 +904,29 @@ p { text-wrap: pretty; }
 /* =========================================================
    7. BENEFÍCIOS
    ========================================================= */
-.benefits { padding: 0 0 155px; }
-.benefit-heading { display: flex; justify-content: space-between; align-items: end; gap: 35px; margin-bottom: 48px; }
-.benefit-heading > p { max-width: 280px; margin-bottom: 5px; }
+.benefits { padding: 0 0 90px; }
+/* Cabeçalho em bloco único: o texto de apoio fica logo abaixo do título, sem vão no meio. */
+.benefit-heading { max-width: 640px; margin-bottom: 64px; }
+.benefit-heading > p { max-width: 420px; margin: 22px 0 0; }
 
-.benefit-list { border-top: 1px solid var(--line); }
-.benefit-list article {
-  display: grid;
-  grid-template-columns: 65px 1fr 45px;
-  align-items: center;
-  gap: 25px;
-  padding: 25px 10px;
-  border-bottom: 1px solid var(--line);
-  transition: padding .25s, background .25s;
+/* Grade aberta de 4 colunas: sem bordas nem divisórias, o respiro separa os itens. */
+.benefit-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 48px 40px; }
+.benefit-list article { display: flex; flex-direction: column; align-items: flex-start; }
+.benefit-icon {
+  height: 52px; width: 52px; margin-bottom: 26px;
+  border-radius: 16px; display: grid; place-items: center;
+  font-size: 24px; color: var(--orange);
+  background: color-mix(in srgb, var(--orange) 12%, transparent);
+  transition: background-color .25s, color .25s, transform .25s;
 }
-.benefit-list article:hover { padding-left: 20px; background: color-mix(in srgb, var(--orange) 5%, transparent); }
-.benefit-icon { height: 48px; width: 48px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; font-size: 24px; color: var(--orange); }
-.benefit-list h3 { font: 600 21px 'Manrope', sans-serif; margin: 0 0 7px; letter-spacing: -.4px; }
-.benefit-list p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
-.benefit-arrow { width: 37px; height: 37px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; color: var(--muted); transition: background-color .2s, border-color .2s, color .2s, transform .2s; }
-.benefit-list article:hover .benefit-arrow { background: var(--orange); border-color: var(--orange); color: white; transform: rotate(-45deg); }
-.benefit-arrow svg { width: 16px; }
+.benefit-list article:hover .benefit-icon { background: var(--orange); color: #fff; transform: translateY(-3px); }
+.benefit-list h3 { font: 600 21px 'Manrope', sans-serif; margin: 0 0 10px; letter-spacing: -.4px; }
+.benefit-list p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 260px; }
 
 /* =========================================================
    8. PLANOS E PREÇOS
    ========================================================= */
-.plan-section { padding: 90px 0 100px; border-top: 1px solid var(--line); }
+.plan-section { padding: 90px 0 100px; }
 .plan-heading { text-align: center; margin-bottom: 42px; }
 .plan-heading .section-kicker { justify-content: center; }
 .plan-heading > p { margin: 15px auto 0; max-width: 300px; }
@@ -1174,7 +1189,8 @@ p { text-wrap: pretty; }
    ========================================================= */
 @media (max-width: 900px) {
   .navbar, .section-shell, .hero, .footer { width: min(1240px, calc(100% - 80px)); }
-  .navbar { top: 8px; margin-top: 8px; padding: 0 14px; height: 76px; }
+  .navbar { top: 8px; margin-top: 8px; padding: 0 14px; height: 76px; width: calc(100% - 140px); }
+  .theme-toggle { top: 23px; right: 18px; }
   .nav-links { gap: 12px; }
   .nav-links > a:not(.nav-cta) { font-size: 13px; }
   .nav-cta { padding: 10px 12px; font-size: 13px; }
@@ -1189,6 +1205,8 @@ p { text-wrap: pretty; }
   .story-card h3 { font-size: 20px; }
   .story-card p { font-size: 13px; }
 
+  .benefit-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 36px; }
+
   .plan-card { padding: 24px 18px; }
   .plan-price { font-size: 29px; }
 
@@ -1200,7 +1218,8 @@ p { text-wrap: pretty; }
 
 @media (max-width: 680px) {
   .navbar, .section-shell, .hero, .footer { width: calc(100% - 36px); }
-  .navbar { top: 7px; margin-top: 7px; height: 60px; padding: 0 8px 0 12px; }
+  .navbar { top: 7px; margin-top: 7px; height: 60px; padding: 0 8px 0 12px; width: calc(100% - 88px); margin-left: 18px; }
+  .theme-toggle { top: 14px; right: 14px; }
   .brand { font-size: 23px; }
   .brand img { width: 37px; height: 37px; }
 
@@ -1243,7 +1262,7 @@ p { text-wrap: pretty; }
   .scroll-cue { position: static; margin: 0 0 26px; }
 
   .story { padding-bottom: 95px; }
-  .story-grid, .benefit-heading { grid-template-columns: 1fr; display: grid; gap: 22px; }
+  .story-grid { grid-template-columns: 1fr; display: grid; gap: 22px; }
   .story h2, .benefit-heading h2, .plan-heading h2, .reviews-top h2, .faq-section h2 { font-size: clamp(43px, 11vw, 58px); letter-spacing: -3px; }
   .story-cards { grid-template-columns: 1fr; margin-top: 35px; gap: 10px; }
   .story-card { min-height: 290px; padding: 22px; }
@@ -1253,14 +1272,15 @@ p { text-wrap: pretty; }
   .story-card h3 { font-size: 23px; }
   .story-card p { font-size: 14px; max-width: 320px; }
 
-  .benefits { padding-bottom: 95px; }
+  .benefits { padding-bottom: 50px; }
+  .benefit-heading { margin-bottom: 44px; }
   .benefit-heading > p { max-width: 340px; margin-top: 15px; }
-  .benefit-list article { grid-template-columns: 44px 1fr 30px; gap: 12px; padding: 20px 0; }
-  .benefit-icon { width: 38px; height: 38px; font-size: 20px; }
-  .benefit-list h3 { font-size: 17px; }
-  .benefit-list p { font-size: 14px; }
-  .benefit-arrow { width: 29px; height: 29px; }
-  .benefit-arrow svg { width: 13px; }
+  /* No celular vira uma coluna: ícone ao lado do texto, ainda sem linhas. */
+  .benefit-list { grid-template-columns: 1fr; gap: 30px; }
+  .benefit-list article { display: grid; grid-template-columns: 44px 1fr; column-gap: 16px; align-items: start; }
+  .benefit-icon { grid-row: span 2; width: 44px; height: 44px; margin: 0; border-radius: 13px; font-size: 20px; }
+  .benefit-list h3 { font-size: 17px; margin: 2px 0 6px; }
+  .benefit-list p { font-size: 14px; max-width: none; }
 
   .plan-section { padding: 55px 0 95px; }
   .plans-grid { grid-template-columns: 1fr; gap: 20px; margin-top: 40px; }
@@ -1388,7 +1408,7 @@ p { text-wrap: pretty; }
     text-align: center;
   }
 
-  /* Tamanhos de fonte mantidos legíveis (o amigo sugeriu 9px no kicker e 13px na descrição) */
+  /* Tamanhos de fonte mantidos legíveis (o jão sugeriu 9px no kicker e 13px na descrição) */
   .hero h1 {
     font-size: clamp(42px, 10vw, 58px);
     line-height: 0.98;

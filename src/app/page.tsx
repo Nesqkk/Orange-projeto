@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, Menu, Moon, Sun, X, Sparkles } from "lucide-react";
@@ -73,26 +73,31 @@ const faqs = [
 export default function Home() {
   const [light, setLight] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrollStage, setScrollStage] = useState(0);
   const [stuck, setStuck] = useState(false);
   const [activeCard, setActiveCard] = useState(0);
+  const siteRef = useRef<HTMLDivElement>(null);
   const currentCard = storyCards[activeCard];
-  const themeClass = `${light ? "site light" : "site"} scroll-stage-${scrollStage}`;
+  const themeClass = light ? "site light" : "site";
 
-  // Ajusta suavemente a atmosfera do fundo conforme a pessoa percorre a página.
+  // Aquece o laranja do fundo de forma contínua conforme a pessoa percorre a página.
+  // A variável CSS é escrita direto no elemento (1x por frame) para não re-renderizar o React a cada scroll.
   useEffect(() => {
-    const updateStage = () => {
+    let frame = 0;
+    const updateProgress = () => {
+      frame = 0;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-      setScrollStage(Math.min(4, Math.floor(progress * 5)));
+      const progress = maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
+      siteRef.current?.style.setProperty("--scroll-progress", progress.toFixed(3));
       setStuck(window.scrollY > 24);
     };
-    updateStage();
-    window.addEventListener("scroll", updateStage, { passive: true });
-    window.addEventListener("resize", updateStage);
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(updateProgress); };
+    updateProgress();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
-      window.removeEventListener("scroll", updateStage);
-      window.removeEventListener("resize", updateStage);
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
@@ -120,12 +125,17 @@ export default function Home() {
   }, [menuOpen]);
 
   return (
-    <div className={themeClass}>
+    <div className={themeClass} ref={siteRef}>
       <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
       <div className="ambient ambient-one" aria-hidden="true" />
       <div className="ambient ambient-two" aria-hidden="true" />
 
-      {/* Header reduzido: somente o símbolo da marca, navegação essencial e tema. */}
+      {/* Botão de tema fora da navbar, fixo no canto direito da tela. */}
+      <button type="button" className="theme-toggle" onClick={alternarTema} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
+        {light ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
+      </button>
+
+      {/* Header reduzido: somente o símbolo da marca e a navegação essencial. */}
       <header className={stuck ? "navbar is-stuck" : "navbar"}>
         <a className="brand brand-symbol-only" href="#inicio" aria-label="Orange — início">
           <LogoAnimada altura={44} />
@@ -138,9 +148,6 @@ export default function Home() {
           <a className="nav-cta" href="#planos" onClick={() => setMenuOpen(false)}>Ver planos <ArrowRight size={15} aria-hidden="true" /></a>
         </nav>
         <div className="toggle">
-          <button type="button" className="theme-toggle" onClick={alternarTema} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
-            {light ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
-          </button>
           <button type="button" className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="menu-principal">
             {menuOpen ? <X /> : <Menu />}
           </button>
@@ -209,20 +216,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Benefícios em lista para manter a leitura objetiva. */}
+      {/* Benefícios em grade aberta: sem linhas nem setas, só ícone, título e texto. */}
       <section className="benefits section-shell" id="beneficios">
         <div className="benefit-heading">
-          <div>
-            <div className="section-kicker">02 / POR QUE ORANGE?</div>
-            <h2>Pequenas escolhas.<br /><span>Boa energia.</span></h2>
-          </div>
+          <div className="section-kicker">02 / POR QUE ORANGE?</div>
+          <h2>Pequenas escolhas.<br /><span>Boa energia.</span></h2>
           <p>Seu ritual de frescor ficou mais gostoso — e mais consciente.</p>
         </div>
         <div className="benefit-list">
-          <article><span className="benefit-icon" aria-hidden="true">✳</span><div><h3>Natural de verdade</h3><p>O sabor da laranja como ele deve ser: vivo, cítrico e direto ao ponto.</p></div><span className="benefit-arrow" aria-hidden="true"><ArrowRight /></span></article>
-          <article><span className="benefit-icon" aria-hidden="true">↻</span><div><h3>Devolveu, ganhou</h3><p>Devolva sua garrafa e receba cashback conforme as regras do programa.</p></div><span className="benefit-arrow" aria-hidden="true"><ArrowRight /></span></article>
-          <article><span className="benefit-icon" aria-hidden="true">⌁</span><div><h3>Seu ritmo, suas regras</h3><p>Compre quando quiser ou escolha uma assinatura recorrente.</p></div><span className="benefit-arrow" aria-hidden="true"><ArrowRight /></span></article>
-          <article><span className="benefit-icon" aria-hidden="true">◉</span><div><h3>Conectada com você</h3><p>A tecnologia NFC aproxima a garrafa da sua experiência digital.</p></div><span className="benefit-arrow" aria-hidden="true"><ArrowRight /></span></article>
+          <article><span className="benefit-icon" aria-hidden="true">✳</span><h3>Natural de verdade</h3><p>O sabor da laranja como ele deve ser: vivo, cítrico e direto ao ponto.</p></article>
+          <article><span className="benefit-icon" aria-hidden="true">↻</span><h3>Devolveu, ganhou</h3><p>Devolva sua garrafa e receba cashback conforme as regras do programa.</p></article>
+          <article><span className="benefit-icon" aria-hidden="true">⌁</span><h3>Seu ritmo, suas regras</h3><p>Compre quando quiser ou escolha uma assinatura recorrente.</p></article>
+          <article><span className="benefit-icon" aria-hidden="true">◉</span><h3>Conectada com você</h3><p>A tecnologia NFC aproxima a garrafa da sua experiência digital.</p></article>
         </div>
       </section>
 
