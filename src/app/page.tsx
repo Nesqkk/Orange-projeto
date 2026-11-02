@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type HTMLAttributes, type PointerEvent as ReactPointerEvent } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, Menu, Moon, Sun, X, Sparkles } from "lucide-react";
@@ -21,6 +21,15 @@ const plans = [
   { name: "Orange Club", amount: "R$ 34,90", detail: "/ mês", description: "Sua dose de frescor, sem complicação.", perks: ["4 garrafas por mês", "Cashback na devolução", "Acesso a edições especiais"], featured: true },
   { name: "Orange+", amount: "R$ 44,90", detail: "/ mês", description: "Mais cuidado na sua rotina.", perks: ["4 garrafas enriquecidas com colágeno", "Cashback na devolução", "Entrega recorrente"], featured: false },
 ];
+
+// Card que está sendo jogado para fora da tela: para que lado (-1 esquerda, 1 direita) e de onde
+// ele partiu (deX), caso a pessoa tenha arrastado antes de soltar.
+type CardSaindo = { card: StoryCard; direcao: -1 | 1; deX: number; id: number };
+
+// Arrasto mínimo (px) para o card ser jogado ao soltar; menos que isso, ele volta pro lugar.
+const ARRASTO_PARA_JOGAR = 90;
+// Um peteleco rápido também joga, mesmo com arrasto curto: basta passar de 30px a mais de 0,5px/ms.
+const PETELECO = { arrasto: 30, velocidade: 0.5 };
 
 type StoryCard = {
   number: string;
@@ -92,6 +101,10 @@ export default function Home() {
   const navRef = useRef<HTMLElement>(null);
   const derrameRef = useRef<HTMLDivElement>(null);
   const planosRef = useRef<HTMLElement>(null);
+  // Lista (e não um só) para cliques rápidos seguidos: cada card termina o próprio voo.
+  const [cardsSaindo, setCardsSaindo] = useState<CardSaindo[]>([]);
+  const vooId = useRef(0);
+  const arrasto = useRef<{ inicioX: number; dx: number; ultimoX: number; ultimoT: number; velocidade: number } | null>(null);
   const currentCard = storyCards[activeCard];
   const themeClass = light ? "site light" : "site";
 
@@ -158,6 +171,50 @@ export default function Home() {
     window.addEventListener("resize", posicionar);
     return () => window.removeEventListener("resize", posicionar);
   }, [secaoAtiva]);
+
+  // Troca o card da seção 01 jogando o atual para fora da tela (para o lado `direcao`).
+  const trocarCard = (proximo: number, direcao: -1 | 1, deX = 0) => {
+    if (proximo === activeCard) return;
+    const id = ++vooId.current;
+    setCardsSaindo((lista) => [...lista, { card: currentCard, direcao, deX, id }]);
+    setActiveCard(proximo);
+  };
+  const proximoCard = (deX = 0) => trocarCard((activeCard + 1) % storyCards.length, -1, deX);
+  const cardAnterior = (deX = 0) => trocarCard((activeCard - 1 + storyCards.length) % storyCards.length, 1, deX);
+
+  // Arrastar o card para os lados: ele acompanha o dedo/mouse e, se passar do limite (ou levar um
+  // peteleco), é jogado. O estilo é escrito direto no elemento durante o arrasto para não re-renderizar
+  // o React a cada movimento. Usa `translate`/`rotate` (e não `transform`) para somar com o hover do card.
+  const comecarArrasto = (e: ReactPointerEvent<HTMLElement>) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    arrasto.current = { inicioX: e.clientX, dx: 0, ultimoX: e.clientX, ultimoT: e.timeStamp, velocidade: 0 };
+    e.currentTarget.setPointerCapture(e.pointerId);
+    e.currentTarget.classList.add("is-arrastando");
+  };
+  const moverArrasto = (e: ReactPointerEvent<HTMLElement>) => {
+    const a = arrasto.current;
+    if (!a) return;
+    const dt = e.timeStamp - a.ultimoT;
+    if (dt > 0) a.velocidade = a.velocidade * 0.3 + ((e.clientX - a.ultimoX) / dt) * 0.7; // suaviza os trancos
+    a.ultimoX = e.clientX;
+    a.ultimoT = e.timeStamp;
+    a.dx = e.clientX - a.inicioX;
+    e.currentTarget.style.translate = `${a.dx}px 0`;
+    e.currentTarget.style.rotate = `${a.dx / 25}deg`;
+  };
+  const soltarArrasto = (e: ReactPointerEvent<HTMLElement>) => {
+    const a = arrasto.current;
+    if (!a) return;
+    arrasto.current = null;
+    e.currentTarget.classList.remove("is-arrastando");
+    e.currentTarget.style.translate = "";
+    e.currentTarget.style.rotate = "";
+    // Se o dedo parou antes de soltar, não conta como peteleco.
+    const velocidade = e.timeStamp - a.ultimoT > 100 ? 0 : a.velocidade;
+    const peteleco = Math.abs(a.dx) > PETELECO.arrasto && Math.abs(velocidade) > PETELECO.velocidade && Math.sign(velocidade) === Math.sign(a.dx);
+    if (a.dx <= -ARRASTO_PARA_JOGAR || (peteleco && a.dx < 0)) proximoCard(a.dx);
+    else if (a.dx >= ARRASTO_PARA_JOGAR || (peteleco && a.dx > 0)) cardAnterior(a.dx);
+  };
 
   // Lembra o tema escolhido; na primeira visita segue o tema do aparelho.
   useEffect(() => {
@@ -250,18 +307,32 @@ export default function Home() {
           <h2 data-reveal>Não é só suco.<br /><span>É sentir o agora.</span></h2>
         </div>
         <div className="story-cards is-carousel" data-reveal>
-          <article key={currentCard.number} className={`story-card ${currentCard.style}`} aria-live="polite">
-            <span className="card-number">{currentCard.number}</span>
-            <div className={artClass[currentCard.artType]} aria-hidden="true">
-              {currentCard.artText}
-            </div>
-            <h3>{currentCard.title}</h3>
-            <p>{currentCard.description}</p>
-            <span className="card-caption">{currentCard.caption}</span>
-          </article>
+          {/* Card atual: dá para arrastar para os lados e jogar. */}
+          <StoryCardView
+            key={currentCard.number}
+            card={currentCard}
+            aria-live="polite"
+            onPointerDown={comecarArrasto}
+            onPointerMove={moverArrasto}
+            onPointerUp={soltarArrasto}
+            onPointerCancel={soltarArrasto}
+          />
+          {/* Cards anteriores voando para fora da tela por cima do novo; cada um some quando o voo acaba. */}
+          {cardsSaindo.map((saindo) => (
+            <StoryCardView
+              key={`saindo-${saindo.id}`}
+              card={saindo.card}
+              className="is-saindo"
+              aria-hidden="true"
+              style={{ "--dir": saindo.direcao, "--de-x": `${saindo.deX}px`, "--de-rot": `${saindo.deX / 25}deg` } as CSSProperties}
+              onAnimationEnd={(e) => {
+                if (e.animationName === "card-jogado") setCardsSaindo((lista) => lista.filter((s) => s.id !== saindo.id));
+              }}
+            />
+          ))}
           {/* Dots com as mesmas classes do carrossel de avaliações. */}
           <div className="morphing-dots">
-            <button type="button" onClick={() => setActiveCard((activeCard - 1 + storyCards.length) % storyCards.length)} aria-label="Card anterior">
+            <button type="button" onClick={() => cardAnterior()} aria-label="Card anterior">
               <ChevronLeft size={16} aria-hidden="true" />
             </button>
             <div className="morphing-dots-list">
@@ -270,13 +341,13 @@ export default function Home() {
                   type="button"
                   key={card.number}
                   className={index === activeCard ? "morphing-dot active" : "morphing-dot"}
-                  onClick={() => setActiveCard(index)}
+                  onClick={() => trocarCard(index, index > activeCard ? -1 : 1)}
                   aria-label={`Ver card ${card.number}`}
                   aria-current={index === activeCard ? "true" : undefined}
                 />
               ))}
             </div>
-            <button type="button" onClick={() => setActiveCard((activeCard + 1) % storyCards.length)} aria-label="Próximo card">
+            <button type="button" onClick={() => proximoCard()} aria-label="Próximo card">
               <ChevronRight size={16} aria-hidden="true" />
             </button>
           </div>
@@ -378,6 +449,21 @@ export default function Home() {
         </div>
       </footer>
     </div>
+  );
+}
+
+// Card da seção 01; usado para o card atual e para o que está sendo jogado para fora.
+function StoryCardView({ card, className = "", ...resto }: { card: StoryCard } & HTMLAttributes<HTMLElement>) {
+  return (
+    <article className={`story-card ${card.style} ${className}`} {...resto}>
+      <span className="card-number">{card.number}</span>
+      <div className={artClass[card.artType]} aria-hidden="true">
+        {card.artText}
+      </div>
+      <h3>{card.title}</h3>
+      <p>{card.description}</p>
+      <span className="card-caption">{card.caption}</span>
+    </article>
   );
 }
 

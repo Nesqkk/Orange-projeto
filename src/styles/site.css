@@ -129,6 +129,8 @@ Botões magnéticos: [data-magnetic], .is-magnetic (seção 20 + src/lib/use-bot
 
 Suco derramando na tela (ao chegar nos planos): .derrame-tela, .is-derramando, --derrame, --escoa (seção 22 + src/lib/use-suco-derramando.ts)
 
+Cards da seção 01 jogados para fora: .is-saindo, .is-arrastando, card-jogado, card-por-baixo (seção 23)
+
 Media Queries: Regras responsivas otimizadas para telas menores de 900px e 680px, além de suporte a prefers-reduced-motion para acessibilidade de movimento.*/
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
@@ -1767,3 +1769,41 @@ p { text-wrap: pretty; }
   .derrame-gota:nth-child(n) { --w: 12px; } /* :nth-child(n) para valer por cima das regras de cada gota */
   .derrame-gota:nth-child(4) { --w: 18px; }
 }
+
+
+/* =========================================================
+   23. CARDS DA SEÇÃO 01 JOGADOS PARA FORA
+   Ao trocar de card (setas, bolinhas ou arrastando), o atual voa para fora
+   da tela girando, por cima do novo, que sobe de trás. Os dois ocupam a mesma
+   célula do grid durante a troca. O lado vem de --dir (-1 esquerda, 1 direita);
+   se a pessoa arrastou antes de soltar, o voo parte de onde o card estava (--de-x).
+   Jogam o card: passar de 90px arrastando ou um peteleco rápido (page.tsx).
+   ========================================================= */
+.story-cards.is-carousel .story-card { grid-area: 1 / 1; }
+.story-cards.is-carousel .story-card:not(.is-saindo) {
+  animation: card-por-baixo .55s cubic-bezier(.2, .8, .2, 1);
+  touch-action: pan-y; /* rolar a página na vertical continua funcionando no celular */
+  cursor: grab;
+  /* O arrasto usa translate/rotate (somam com o hover); soltando antes do limite, volta com um quique. */
+  transition:
+    transform .5s cubic-bezier(.2, .8, .2, 1),
+    box-shadow .5s cubic-bezier(.2, .8, .2, 1),
+    border-color .35s,
+    translate .55s cubic-bezier(.34, 1.56, .64, 1),
+    rotate .55s cubic-bezier(.34, 1.56, .64, 1);
+}
+.story-cards.is-carousel .story-card.is-arrastando {
+  transition: none;
+  cursor: grabbing;
+  user-select: none;
+}
+.story-cards.is-carousel .story-card.is-saindo {
+  z-index: 2;
+  pointer-events: none;
+  animation: card-jogado .65s cubic-bezier(.4, .1, .6, 1) both;
+}
+@keyframes card-jogado {
+  from { transform: translateX(var(--de-x, 0px)) rotate(var(--de-rot, 0deg)); }
+  to { transform: translateX(calc(var(--dir) * 115vw)) translateY(-40px) rotate(calc(var(--dir) * 26deg)); }
+}
+@keyframes card-por-baixo { from { opacity: .35; transform: scale(.9) translateY(16px); } }
