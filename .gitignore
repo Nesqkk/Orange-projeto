@@ -18,5 +18,6 @@ mobile/dist/
 *.tsbuildinfo
 .env*
 !.env.example
+!.env.docker.example
 backend/.env*
 !backend/.env.example

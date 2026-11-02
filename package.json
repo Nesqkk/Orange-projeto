@@ -13,6 +13,9 @@
     "db:generate": "npm --prefix backend run prisma:generate",
     "db:migrate": "npm --prefix backend run prisma:migrate",
     "db:seed": "npm --prefix backend run db:seed",
+    "docker:up": "docker compose up --build -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f --tail=100",
     "mobile:start": "npm --prefix mobile run start"
   },
   "description": "Monorepo Beba Orange: frontend Next.js, API NestJS e dados MariaDB/Prisma"

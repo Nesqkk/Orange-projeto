@@ -9,7 +9,7 @@ Aplicação Next.js responsável pelo site público, cadastro/login, área do cl
 - `src/lib/`: hooks e utilitários do navegador.
 - `src/styles/`: estilos visuais do site e do painel.
 - `public/`: imagens, modelos 3D e arquivos públicos.
-- `next.config.ts`: encaminha `/api/*` para o backend usando `BACKEND_URL`.
+- `next.config.mjs`: encaminha `/api/*` para o backend usando `BACKEND_URL`.
 
 ## Executar
 
