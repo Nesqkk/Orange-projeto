@@ -113,6 +113,22 @@ Variáveis de tema (Dark/Light): :root, .site, .site.light (progressão do laran
 
 Animações (@keyframes): bottle-float, featured-glow, glow, liquid-wave, marquee, scroll-down, spin-slow
 
+Revelar ao rolar: [data-reveal], .reveal-ready, .is-revealed (seção 15 + src/lib/use-revelar-ao-rolar.ts)
+
+Inclinação 3D dos planos: [data-tilt], .is-tilting (seção 16 + src/lib/use-inclinacao-3d.ts)
+
+Indicador da seção atual na navbar: .nav-indicator, .has-indicator, [aria-current] (seção 17)
+
+FAQ abrindo suave: ::details-content, .faq-icon (seção 18)
+
+Palavra laranja escorrendo nos títulos: --liquido, liquido-desce (seção 19)
+
+Botões magnéticos: [data-magnetic], .is-magnetic (seção 20 + src/lib/use-botoes-magneticos.ts)
+
+Ícones dos benefícios com gesto: .benefit-icon[data-gesto] (seção 21)
+
+Suco derramando na tela (ao chegar nos planos): .derrame-tela, .is-derramando, --derrame, --escoa (seção 22 + src/lib/use-suco-derramando.ts)
+
 Media Queries: Regras responsivas otimizadas para telas menores de 900px e 680px, além de suporte a prefers-reduced-motion para acessibilidade de movimento.*/
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
@@ -1103,8 +1119,6 @@ p { text-wrap: pretty; }
   gap: 18px;
 }
 .faq-item details > summary::-webkit-details-marker { display: none; }
-.faq-item details > summary::after { content: "+"; color: var(--orange); font-size: 23px; font-weight: 300; }
-.faq-item details[open] > summary::after { content: "−"; }
 .faq-item details > p { font-size: 15px; line-height: 1.7; color: var(--muted); max-width: 530px; margin: 0; padding: 0 35px 22px 0; }
 
 /* =========================================================
@@ -1439,4 +1453,317 @@ p { text-wrap: pretty; }
   }
 
   .hero-visual { height: clamp(500px, 72vh, 600px); margin-top: 24px; }
+}
+
+
+/* =========================================================
+   15. REVELAR AO ROLAR
+   Elementos com `data-reveal` ficam invisíveis até entrarem na tela;
+   a subida + fade é feita em src/lib/use-revelar-ao-rolar.ts.
+   `.reveal-ready` só é aplicada pelo JS (e nunca com "reduzir movimento"),
+   então sem JS a página aparece inteira.
+   ========================================================= */
+.reveal-ready [data-reveal]:not(.is-revealed) { opacity: 0; }
+
+
+/* =========================================================
+   16. INCLINAÇÃO 3D DOS PLANOS
+   O JS (src/lib/use-inclinacao-3d.ts) só atualiza as variáveis;
+   aqui elas entram no mesmo `transform` do hover e da escala do destaque.
+   ========================================================= */
+[data-tilt] { --tilt-x: 0deg; --tilt-y: 0deg; --glare-x: 50%; --glare-y: 0%; }
+.plan-card[data-tilt] { transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)); }
+.plan-card[data-tilt]:hover { transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(-3px); }
+.plan-card.featured[data-tilt] { transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1.06); }
+.plan-card.featured[data-tilt]:hover { transform: perspective(1000px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1.06) translateY(-4px); }
+/* Enquanto o mouse se move, o transform responde rápido; ao sair, volta no ritmo normal (.35s). */
+.plan-card.is-tilting { transition-duration: .12s, .35s, .5s; }
+
+/* Brilho que segue o cursor, como o reflexo numa garrafa. */
+.plan-card[data-tilt]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--glare-x) var(--glare-y), color-mix(in srgb, var(--orange) 16%, transparent), transparent 55%);
+  opacity: 0;
+  transition: opacity .4s;
+}
+.plan-card.featured[data-tilt]::after { background: radial-gradient(circle at var(--glare-x) var(--glare-y), rgba(255, 255, 255, .32), transparent 55%); }
+.plan-card.is-tilting::after { opacity: 1; }
+
+@media (max-width: 680px) {
+  .plan-card.featured[data-tilt], .plan-card.featured[data-tilt]:hover { transform: none; }
+}
+
+
+/* =========================================================
+   17. INDICADOR DA SEÇÃO ATUAL NA NAVBAR
+   Uma pílula desliza até o link da seção em que a pessoa está.
+   page.tsx descobre a seção e escreve --ind-x / --ind-w na <nav>.
+   No celular a pílula some e o link atual fica laranja no menu.
+   ========================================================= */
+.nav-indicator { display: none; }
+.nav-links > a { position: relative; } /* links por cima da pílula */
+.nav-links > a[aria-current]:not(.nav-cta) { color: var(--text); }
+/* Em "Planos" quem ganha destaque é o próprio botão laranja, com um anel. */
+.nav-cta { transition: background .2s, box-shadow .35s; }
+.nav-cta[aria-current] { box-shadow: 0 0 0 4px color-mix(in srgb, var(--orange) 30%, transparent); }
+
+@media (min-width: 681px) {
+  .nav-links { position: relative; }
+  .nav-indicator {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 38px;
+    width: var(--ind-w, 0);
+    transform: translate(var(--ind-x, 0), -50%);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--text) 9%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .5s cubic-bezier(.2, .8, .2, 1), width .5s cubic-bezier(.2, .8, .2, 1), opacity .3s;
+  }
+  .nav-links.has-indicator .nav-indicator { opacity: 1; }
+}
+@media (max-width: 680px) {
+  .nav-links > a[aria-current]:not(.nav-cta) { color: var(--orange); }
+}
+
+
+/* =========================================================
+   18. FAQ ABRINDO SUAVE
+   A resposta desliza ao abrir e ao fechar, e o "+" gira até virar "−".
+   Usa ::details-content + interpolate-size; navegadores sem suporte
+   simplesmente abrem na hora, como antes.
+   ========================================================= */
+.faq-item details { interpolate-size: allow-keywords; }
+.faq-item details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition: block-size .45s cubic-bezier(.2, .8, .2, 1), content-visibility .45s allow-discrete;
+}
+.faq-item details[open]::details-content { block-size: auto; }
+.faq-item details > p { opacity: 0; translate: 0 -6px; transition: opacity .35s, translate .45s cubic-bezier(.2, .8, .2, 1); }
+.faq-item details[open] > p { opacity: 1; translate: 0 0; }
+
+/* Ícone "+" desenhado com duas barras: a vertical gira até deitar e vira "−". */
+.faq-icon { position: relative; flex-shrink: 0; width: 16px; height: 16px; }
+.faq-icon::before,
+.faq-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  margin-top: -.75px;
+  border-radius: 2px;
+  background: var(--orange);
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+}
+.faq-icon::after { transform: rotate(90deg); }
+.faq-item details[open] .faq-icon::after { transform: rotate(180deg); }
+
+
+/* =========================================================
+   19. PALAVRA LARANJA ESCORRENDO NOS TÍTULOS
+   A parte destacada dos títulos se enche de cima para baixo, como suco escorrendo.
+   O texto fica com um "fantasma" da cor (22%) e a cor cheia desce por cima.
+   Usa currentColor, então serve tanto para o laranja quanto para o marrom da chamada final.
+   - Hero ("vivo"): animação CSS pura ao carregar a página.
+   - Títulos das seções: enche quando o título aparece (revelar ao rolar, seção 15).
+   ========================================================= */
+@property --liquido { syntax: "<percentage>"; inherits: false; initial-value: 100%; }
+
+.hero h1 span,
+.reveal-ready h2[data-reveal] span {
+  -webkit-text-fill-color: transparent; /* mantém `color` vivo para o currentColor do fundo */
+  background:
+    linear-gradient(to bottom, currentColor calc(100% - .14em), transparent) top / 100% calc(var(--liquido) + .14em) no-repeat,
+    linear-gradient(color-mix(in srgb, currentColor 22%, transparent), color-mix(in srgb, currentColor 22%, transparent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-box-decoration-break: clone; /* cada linha enche por conta própria */
+  box-decoration-break: clone;
+}
+
+.hero h1 span { animation: liquido-desce 1.3s cubic-bezier(.5, 0, .2, 1) .6s both; }
+@keyframes liquido-desce { from { --liquido: 0%; } to { --liquido: 100%; } }
+
+.reveal-ready h2[data-reveal] span { --liquido: 0%; transition: --liquido 1.2s cubic-bezier(.5, 0, .2, 1) .45s; }
+.reveal-ready h2.is-revealed span { --liquido: 100%; }
+
+
+/* =========================================================
+   20. BOTÕES MAGNÉTICOS
+   O botão é puxado de leve em direção ao cursor quando ele chega perto,
+   e a seta dentro dele vai um pouco mais longe. O JS só escreve --mag-x / --mag-y.
+   Usa `translate` (e não `transform`) para somar com o hover e o clique do .button.
+   ========================================================= */
+.button[data-magnetic] {
+  --mag-x: 0px;
+  --mag-y: 0px;
+  translate: var(--mag-x) var(--mag-y);
+  transition: transform .25s, background-color .25s, border-color .25s, color .25s, border-radius .25s, translate .6s cubic-bezier(.2, .8, .2, 1);
+}
+.button[data-magnetic] svg { translate: calc(var(--mag-x) * .6) calc(var(--mag-y) * .6); transition: translate .6s cubic-bezier(.2, .8, .2, 1); }
+/* Perto do cursor responde rápido; ao se afastar, volta no ritmo calmo de cima. */
+.button.is-magnetic { transition-duration: .25s, .25s, .25s, .25s, .25s, .18s; }
+.button.is-magnetic svg { transition-duration: .18s; }
+
+
+/* =========================================================
+   21. ÍCONES DOS BENEFÍCIOS COM GESTO
+   Cada ícone faz um movimento que combina com o que ele significa:
+   ✳ girar (natural, vivo) · ↻ volta (a garrafa volta pro ciclo) ·
+   ⌁ ritmo (balança no compasso) · ◉ pulsar (sinal de NFC saindo).
+   Com mouse: toca ao passar por cima do benefício.
+   Em telas de toque: toca uma vez quando o benefício aparece (revelar ao rolar).
+   ========================================================= */
+.benefit-icon { position: relative; }
+.benefit-icon > span { display: inline-block; line-height: 1; }
+
+/* Anel do NFC: nasce no ícone e se expande sumindo. */
+.benefit-icon[data-gesto="pulsar"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid var(--orange);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes gesto-girar { to { transform: rotate(180deg); } }
+@keyframes gesto-volta {
+  0% { transform: rotate(0); }
+  75% { transform: rotate(380deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes gesto-ritmo {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-3px) rotate(-12deg); }
+  45% { transform: translateX(3px) rotate(10deg); }
+  70% { transform: translateX(-2px) rotate(-6deg); }
+}
+@keyframes gesto-pulsar {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(.82); }
+  60% { transform: scale(1.12); }
+}
+@keyframes gesto-onda {
+  0% { opacity: .9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+
+@media (hover: hover) {
+  .benefit-list article:hover [data-gesto="girar"] > span { animation: gesto-girar .8s cubic-bezier(.2, .8, .2, 1); }
+  .benefit-list article:hover [data-gesto="volta"] > span { animation: gesto-volta .9s cubic-bezier(.4, 0, .2, 1); }
+  .benefit-list article:hover [data-gesto="ritmo"] > span { animation: gesto-ritmo .7s ease-in-out; }
+  .benefit-list article:hover [data-gesto="pulsar"] > span { animation: gesto-pulsar .7s cubic-bezier(.2, .8, .2, 1); }
+  .benefit-list article:hover [data-gesto="pulsar"]::after { animation: gesto-onda .9s ease-out .15s 2; }
+}
+@media (hover: none) {
+  .benefit-list article.is-revealed [data-gesto="girar"] > span { animation: gesto-girar .8s cubic-bezier(.2, .8, .2, 1) .6s both; }
+  .benefit-list article.is-revealed [data-gesto="volta"] > span { animation: gesto-volta .9s cubic-bezier(.4, 0, .2, 1) .6s both; }
+  .benefit-list article.is-revealed [data-gesto="ritmo"] > span { animation: gesto-ritmo .7s ease-in-out .6s both; }
+  .benefit-list article.is-revealed [data-gesto="pulsar"] > span { animation: gesto-pulsar .7s cubic-bezier(.2, .8, .2, 1) .6s both; }
+  .benefit-list article.is-revealed [data-gesto="pulsar"]::after { animation: gesto-onda .9s ease-out .75s 2; }
+}
+
+
+/* =========================================================
+   22. SUCO DERRAMANDO NA TELA
+   Na primeira chegada aos planos, o suco cai do topo e cobre a tela inteira
+   (fase 1, encher), segura um instante e escorre para baixo (fase 2, escoar),
+   revelando os planos, que só então aparecem. Os tempos ficam aqui; o JS
+   (src/lib/use-suco-derramando.ts) só liga .is-derramando e acompanha as fases.
+     --derrame: 0 → 1 = a borda de baixo do suco desce do topo até passar do fim da tela
+     --escoa:   0 → 1 = a borda de cima desce atrás dela, levando o suco embora
+   ========================================================= */
+@property --derrame { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --escoa { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+.derrame-tela {
+  position: fixed;
+  inset: 0;
+  z-index: 60; /* por cima até da navbar */
+  pointer-events: none;
+  overflow: hidden;
+  display: none;
+  /* Bordas do líquido: ondas que se repetem a cada 240px (de baixo e de cima, espelhadas). */
+  --onda-baixo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='24'%3E%3Cpath d='M0 0H240V12C210 12 210 24 180 24S150 12 120 12 90 24 60 24 30 12 0 12Z'/%3E%3C/svg%3E");
+  --onda-cima: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='24'%3E%3Cpath d='M0 24H240V12C210 12 210 0 180 0S150 12 120 12 90 0 60 0 30 12 0 12Z'/%3E%3C/svg%3E");
+}
+.derrame-tela.is-derramando {
+  display: block;
+  animation:
+    derrame-encher 1.1s cubic-bezier(.55, 0, .35, 1) both,
+    derrame-escoar 1s cubic-bezier(.6, 0, .4, 1) 1.4s both;
+}
+@keyframes derrame-encher { from { --derrame: 0; } to { --derrame: 1; } }
+@keyframes derrame-escoar { from { --escoa: 0; } to { --escoa: 1; } }
+
+/* O líquido vai da borda de cima (começa 60px acima da tela, escondida) até a de baixo.
+   As duas passam 140px do fim da tela para as ondas e gotas sumirem por completo. */
+.derrame-liquido {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: calc(var(--escoa) * (100% + 140px) - 60px);
+  height: calc((var(--derrame) - var(--escoa)) * (100% + 140px) + 60px);
+  background: linear-gradient(to bottom, #e45a0a, var(--orange) 45%, #ff8a2a);
+  -webkit-mask:
+    var(--onda-cima) 0 0 / 240px 24px repeat-x,
+    linear-gradient(#000 0 0) 0 23px / 100% calc(100% - 46px) no-repeat,
+    var(--onda-baixo) 0 100% / 240px 24px repeat-x;
+  mask:
+    var(--onda-cima) 0 0 / 240px 24px repeat-x,
+    linear-gradient(#000 0 0) 0 23px / 100% calc(100% - 46px) no-repeat,
+    var(--onda-baixo) 0 100% / 240px 24px repeat-x;
+  animation: derrame-onda 2.4s linear infinite;
+}
+@keyframes derrame-onda {
+  to {
+    -webkit-mask-position: -240px 0, 0 23px, 240px 100%;
+    mask-position: -240px 0, 0 23px, 240px 100%;
+  }
+}
+
+/* Gotas que correm na frente da borda de baixo; crescem no começo e depois acompanham o líquido. */
+.derrame-gota {
+  position: absolute;
+  top: calc(var(--derrame) * (100% + 140px) - 16px);
+  left: var(--x);
+  width: var(--w);
+  height: calc(min(1, var(--derrame) * 2.5) * var(--h));
+  border-radius: 0 0 999px 999px;
+  background: #ff8a2a;
+}
+/* Ponta da gota: um pouco mais larga que o filete, como gota prestes a cair. */
+.derrame-gota::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: calc(var(--w) * 1.4);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% 0;
+  background: inherit;
+}
+.derrame-gota:nth-child(2) { --x: 6%; --w: 22px; --h: 120px; }
+.derrame-gota:nth-child(3) { --x: 19%; --w: 14px; --h: 60px; }
+.derrame-gota:nth-child(4) { --x: 34%; --w: 30px; --h: 190px; }
+.derrame-gota:nth-child(5) { --x: 51%; --w: 16px; --h: 85px; }
+.derrame-gota:nth-child(6) { --x: 64%; --w: 26px; --h: 150px; }
+.derrame-gota:nth-child(7) { --x: 79%; --w: 12px; --h: 50px; }
+.derrame-gota:nth-child(8) { --x: 91%; --w: 20px; --h: 110px; }
+@media (max-width: 680px) {
+  .derrame-gota:nth-child(n) { --w: 12px; } /* :nth-child(n) para valer por cima das regras de cada gota */
+  .derrame-gota:nth-child(4) { --w: 18px; }
 }
