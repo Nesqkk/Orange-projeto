@@ -10,11 +10,17 @@
     "mobile:start": "npm --prefix mobile run start"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@prisma/client": "^6.19.3",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "next": "^15.3.3",
     "prisma": "^6.19.3",
+=======
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "next": "^15.3.3",
+>>>>>>> 1dae2347a8c5cdabf9b07d2d4e9798de1776c58c
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.6.0",

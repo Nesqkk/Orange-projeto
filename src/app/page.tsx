@@ -130,6 +130,7 @@ export default function Home() {
       <div className="ambient ambient-one" aria-hidden="true" />
       <div className="ambient ambient-two" aria-hidden="true" />
 
+<<<<<<< HEAD
       {/* Botão de tema fora da navbar, fixo no canto direito da tela. */}
       <button type="button" className="theme-toggle" onClick={alternarTema} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
         {light ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
@@ -139,18 +140,36 @@ export default function Home() {
       <header className={stuck ? "navbar is-stuck" : "navbar"}>
         <a className="brand brand-symbol-only" href="#inicio" aria-label="Orange — início">
           <LogoAnimada altura={44} />
+=======
+      {/* Header em 3 peças separadas: logo num círculo, navegação numa pílula e ações à direita. */}
+      <header className={stuck ? "navbar is-stuck" : "navbar"}>
+        <a className="brand nav-orb" href="#inicio" aria-label="Orange — início">
+          <LogoAnimada altura={32} />
+>>>>>>> 1dae2347a8c5cdabf9b07d2d4e9798de1776c58c
         </a>
         <nav id="menu-principal" className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Navegação principal">
           <a href="#conceito" onClick={() => setMenuOpen(false)}>A experiência</a>
           <a href="#beneficios" onClick={() => setMenuOpen(false)}>Benefícios</a>
+<<<<<<< HEAD
           <a href="#planos" onClick={() => setMenuOpen(false)}>Planos</a>
+=======
+>>>>>>> 1dae2347a8c5cdabf9b07d2d4e9798de1776c58c
           <a href="#avaliacoes" onClick={() => setMenuOpen(false)}>Avaliações</a>
           <a className="nav-cta" href="#planos" onClick={() => setMenuOpen(false)}>Ver planos <ArrowRight size={15} aria-hidden="true" /></a>
         </nav>
         <div className="toggle">
+<<<<<<< HEAD
           <button type="button" className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="menu-principal">
             {menuOpen ? <X /> : <Menu />}
           </button>
+=======
+          <button type="button" className="menu-toggle nav-orb" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="menu-principal">
+            {menuOpen ? <X /> : <Menu />}
+          </button>
+          <button type="button" className="theme-toggle nav-orb" onClick={alternarTema} aria-label={light ? "Ativar tema escuro" : "Ativar tema claro"}>
+            {light ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
+          </button>
+>>>>>>> 1dae2347a8c5cdabf9b07d2d4e9798de1776c58c
         </div>
       </header>
 
@@ -242,6 +261,7 @@ export default function Home() {
         <div className="plans-grid">
           {plans.map((plan, index) => (
             <article className={`plan-card ${plan.featured ? "featured" : ""}`} key={plan.name}>
+<<<<<<< HEAD
               {plan.featured && <div className="popular-tag">O FAVORITO <Sparkles size={13} aria-hidden="true" /></div>}
               <div className="plan-topline"><span>{plan.name}</span><span>0{index + 1}</span></div>
               <p className="plan-description">{plan.description}</p>
@@ -249,6 +269,17 @@ export default function Home() {
               <div className="plan-divider" />
               <ul>{plan.perks.map((perk) => <li key={perk}><Check size={15} aria-hidden="true" />{perk}</li>)}</ul>
               <a className={plan.featured ? "button button-orange plan-button" : "button button-outline plan-button"} href={`mailto:oi@orange.com.br?subject=${encodeURIComponent(`Quero conhecer o plano ${plan.name}`)}`}>
+=======
+              {plan.featured && <div className="popular-tag"><Sparkles size={13} aria-hidden="true" /> O MAIS ESCOLHIDO</div>}
+              <div className="plan-topline"><span>{plan.name}</span><span>0{index + 1}</span></div>
+              <p className="plan-description">{plan.description}</p>
+              <div className="plan-price">{plan.amount}<small>{plan.detail}</small></div>
+              {/* No fluxo do card (não mais absoluto), para nunca ficar por cima do número do plano. */}
+              <span className="plan-fictional">Valor fictício</span>
+              <div className="plan-divider" />
+              <ul>{plan.perks.map((perk) => <li key={perk}><Check size={15} aria-hidden="true" />{perk}</li>)}</ul>
+              <a className={plan.featured ? "button button-dark plan-button" : "button button-outline plan-button"} href={`mailto:oi@orange.com.br?subject=${encodeURIComponent(`Quero conhecer o plano ${plan.name}`)}`}>
+>>>>>>> 1dae2347a8c5cdabf9b07d2d4e9798de1776c58c
                 Tenho interesse <ArrowRight size={16} aria-hidden="true" />
               </a>
             </article>
