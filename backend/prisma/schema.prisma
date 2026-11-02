@@ -1,18 +1,144 @@
 generator client {
-  provider = "prisma-client-js"
+  provider               = "prisma-client"
+  output                 = "../src/generated/prisma"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum PlanInterval {
+  MONTHLY
+  YEARLY
+  ONCE
 }
 
 model User {
   id           String   @id @default(uuid())
-  email        String   @unique
+  email        String   @unique @db.VarChar(254)
+  name         String?  @db.VarChar(120)
   passwordHash String
+  role         UserRole @default(CUSTOMER)
+  mfaEnabled   Boolean  @default(false)
+  mfaSecret    String?  @db.Text
+  mfaPendingSecret String? @db.Text
+  mfaBackupCodes String? @db.Text
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  sessions     AuthSession[]
+  challenges   AuthChallenge[]
+  passwordResetTokens PasswordResetToken[]
+  oauthAccounts OAuthAccount[]
+  tickets      SupportTicket[]
+  ticketMessages TicketMessage[] @relation("TicketMessageAuthor")
 
   @@map("users")
+}
+
+model OAuthAccount {
+  id            String   @id @default(uuid())
+  provider      String   @db.VarChar(16)
+  subject       String   @db.VarChar(191)
+  providerEmail String?  @db.VarChar(254)
+  userId        String
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, subject])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
+
+model AuthSession {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique @db.Char(64)
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}
+
+model AuthChallenge {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique @db.Char(64)
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("auth_challenges")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique @db.Char(64)
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model SupportTicket {
+  id        String       @id @default(uuid())
+  userId    String
+  subject   String       @db.VarChar(160)
+  status    TicketStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  TicketMessage[]
+
+  @@index([userId, updatedAt])
+  @@index([status, updatedAt])
+  @@map("support_tickets")
+}
+
+model TicketMessage {
+  id        String        @id @default(uuid())
+  ticketId  String
+  authorId  String
+  content   String        @db.Text
+  createdAt DateTime      @default(now())
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author    User          @relation("TicketMessageAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
+  @@map("ticket_messages")
+}
+
+model Plan {
+  id           String       @id @default(uuid())
+  name         String       @unique @db.VarChar(120)
+  priceInCents Int
+  interval     PlanInterval
+  active       Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("plans")
 }

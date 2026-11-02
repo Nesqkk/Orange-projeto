@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /central-de-operacoes
+Disallow: /login
+Disallow: /cadastro
+Disallow: /esqueci-senha
+Disallow: /redefinir-senha
+
+Content-Signal: search=yes, ai-train=no
+Sitemap: https://bebaorange.com/sitemap.xml

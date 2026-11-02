@@ -1,5 +1,14 @@
 node_modules/
+frontend/node_modules/
+frontend/.next/
+backend/node_modules/
+backend/dist/
+backend/src/generated/prisma/
+backend/prisma/seed.d.ts
+backend/prisma/seed.js
+backend/prisma/seed.js.map
 .next/
+/.hostinger-deploy/
 out/
 build/
 coverage/
@@ -9,3 +18,5 @@ mobile/dist/
 *.tsbuildinfo
 .env*
 !.env.example
+backend/.env*
+!backend/.env.example
