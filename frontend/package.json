@@ -32,5 +32,9 @@
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
   },
+  "overrides": {
+    "postcss": "^8.5.23",
+    "minimatch": "^11.0.1"
+  },
   "description": "Landing page institucional da Orange"
 }

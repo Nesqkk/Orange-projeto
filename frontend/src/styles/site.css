@@ -115,7 +115,7 @@ Animações (@keyframes): bottle-float, featured-glow, glow, liquid-wave, marque
 
 Media Queries: Regras responsivas otimizadas para telas menores de 900px e 680px, além de suporte a prefers-reduced-motion para acessibilidade de movimento.*/
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+/* Fontes carregadas em paralelo no layout.tsx */
 @import "tailwindcss";
 
 /* =========================================================
@@ -1182,7 +1182,7 @@ p { text-wrap: pretty; }
   font: 11px 'DM Mono', monospace;
   letter-spacing: .2px;
 }
-.footer-bottom div { display: flex; gap: 22px; }
+.footer-bottom nav { display: flex; gap: 22px; }
 .footer-bottom a:hover { color: var(--orange); }
 
 /* =========================================================
@@ -1342,7 +1342,7 @@ p { text-wrap: pretty; }
   .footer-main p { justify-self: end; text-align: right; }
   .footer-main > a:last-child { grid-column: 1 / -1; justify-self: start; }
   .footer-bottom { gap: 15px; align-items: flex-start; flex-direction: column; line-height: 1.7; }
-  .footer-bottom div { gap: 17px; flex-wrap: wrap; }
+  .footer-bottom nav { gap: 17px; flex-wrap: wrap; }
   .footer-bottom > span:last-child { display: none; }
 }
 

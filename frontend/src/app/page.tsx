@@ -449,7 +449,7 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <span>© 2026 Orange. Feito com frescor.</span>
-          <div>
+          <nav aria-label="Navegação do site">
             <a href="#planos">Planos</a>
             <a href="#avaliacoes">Avaliações</a>
             <a href="/sobre">Sobre</a>
@@ -457,7 +457,7 @@ export default function Home() {
             <a href="/privacidade">Privacidade</a>
             <a href="/termos">Termos</a>
             <a href="#inicio">Voltar ao topo ↑</a>
-          </div>
+          </nav>
         </div>
       </footer>
     </div>
