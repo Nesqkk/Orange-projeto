@@ -1,0 +1,46 @@
+{
+  "name": "orange-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "prisma generate && nest build && node scripts/prepare-runtime.mjs",
+    "start": "node dist/start.js",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/start.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "db:seed": "prisma db seed"
+  },
+  "dependencies": {
+    "@nestjs/common": "12.3.2",
+    "@nestjs/core": "12.3.2",
+    "@nestjs/platform-express": "12.3.2",
+    "@nestjs/throttler": "6.7.1",
+    "@prisma/adapter-mariadb": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "dotenv": "^16.5.0",
+    "jose": "^6.2.15",
+    "mariadb": "3.5.4",
+    "nodemailer": "^10.3.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "12.0.11",
+    "@nestjs/schematics": "12.0.12",
+    "@nestjs/testing": "12.3.2",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "prisma": "7.10.1",
+    "typescript": "6.0.3"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1"
+  },
+  "engines": {
+    "node": ">=24.15 <25"
+  }
+}

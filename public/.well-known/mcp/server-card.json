@@ -1,0 +1,64 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/mcp-server-card/v1.json",
+  "version": "1.0",
+  "protocolVersion": "2026-07-28",
+  "serverInfo": {
+    "name": "com.bebaorange/site",
+    "title": "Orange — informações públicas do site",
+    "version": "1.0.0"
+  },
+  "description": "Read-only access to Orange public site information and page links.",
+  "websiteUrl": "https://app.bebaorange.com/",
+  "repository": {
+    "url": "https://github.com/Nesqkk/Orange-projeto",
+    "source": "github"
+  },
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://api-app.bebaorange.com/mcp"
+  },
+  "capabilities": {
+    "tools": {}
+  },
+  "tools": [
+    {
+      "name": "orange_site_overview",
+      "title": "Visão geral da Orange",
+      "description": "Retorna informações públicas da Orange e aponta quais detalhes de produto são ilustrativos.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "orange_find_public_page",
+      "title": "Buscar página pública",
+      "description": "Encontra uma página pública Orange pelo assunto, como contato, privacidade, termos ou sobre.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "orange_support_contact",
+      "title": "Contato do suporte Orange",
+      "description": "Retorna o e-mail público de suporte e a página de contato.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    }
+  ]
+}

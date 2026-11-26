@@ -1,0 +1,15 @@
+Options -Indexes
+RewriteEngine On
+
+<FilesMatch "^(README\.md|config\.php|config\.example\.php|schema\.sql|seed-admin\.php|\.env.*)$">
+  Require all denied
+</FilesMatch>
+
+RewriteRule ^mcp/?$ mcp.php [L,QSA]
+RewriteRule ^src(?:/|$) - [F,END,NC]
+RewriteRule ^tests(?:/|$) - [F,END,NC]
+RewriteRule ^migrations(?:/|$) - [F,END,NC]
+RewriteRule ^logs(?:/|$) - [F,END,NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

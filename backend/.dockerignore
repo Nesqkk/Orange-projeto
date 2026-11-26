@@ -1,0 +1,11 @@
+node_modules
+dist
+src/generated/prisma
+.git
+.env*
+.env.admin-credentials
+coverage
+*.tsbuildinfo
+README.md
+*.md
+Dockerfile

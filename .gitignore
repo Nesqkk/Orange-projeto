@@ -1,0 +1,13 @@
+/orange-config.php
+/backend-php/config.php
+/backend-php/.env
+/backend-php/.env.*
+/.env
+/.env.*
+
+/.next/
+/out/
+/node_modules/
+backend/node_modules/
+backend/dist/
+*.tsbuildinfo

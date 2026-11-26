@@ -1,0 +1,3 @@
+/* Entrada global de estilos. A aparência do site fica em src/styles/site.css. */
+@import "../styles/site.css";
+@import "../styles/admin.css";

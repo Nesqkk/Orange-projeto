@@ -1,0 +1,35 @@
+Options -Indexes
+AddType text/markdown .md
+
+<IfModule mod_headers.c>
+  Header set Link "<https://app.bebaorange.com/llms.txt>; rel=\"alternate\"; type=\"text/plain\", <https://app.bebaorange.com/markdown/home>; rel=\"alternate\"; type=\"text/markdown\", <https://app.bebaorange.com/sitemap.xml>; rel=\"sitemap\""
+  Header merge Vary Accept
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_ACCEPT} text/markdown [NC]
+  RewriteRule ^$ /markdown/home.md [L]
+  RewriteRule ^markdown/home/?$ /markdown/home.md [L]
+  RewriteRule ^app/?$ /app/index.html [L]
+  RewriteRule ^app/([^/.]+)/?$ /app/$1.html [L]
+</IfModule>
+
+# Compressão de texto e modelos 3D.
+<IfModule mod_deflate.c>
+  AddType model/gltf-binary .glb
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/markdown application/javascript text/javascript application/json image/svg+xml model/gltf-binary
+</IfModule>
+
+# Cache: arquivos com hash do Next são imutáveis; mídia por 30 dias; HTML sempre revalidado.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|md|txt|xml|json)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(webp|png|jpg|jpeg|svg|ico|glb|woff2)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  <If "%{REQUEST_URI} =~ m#^/(_next/static|app/_expo/static)/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+</IfModule>

@@ -1,0 +1,30 @@
+# Orange
+
+> Projeto de marca de bebidas de laranja e experiência digital. Preços, planos e depoimentos na página inicial são demonstrativos e não representam oferta comercial real.
+
+## Páginas principais
+
+- [Início](https://app.bebaorange.com/): conceito Orange, ideias de produto e perguntas frequentes.
+- [Sobre](https://app.bebaorange.com/sobre): contexto do projeto e das informações demonstrativas.
+- [Contato](https://app.bebaorange.com/contato): atendimento por e-mail e Central de Operações.
+- [Privacidade](https://app.bebaorange.com/privacidade): uso de dados nas funções de conta e suporte.
+- [Termos](https://app.bebaorange.com/termos): condições de uso e esclarecimento sobre conteúdo demonstrativo.
+- [Representação Markdown da página inicial](https://app.bebaorange.com/markdown/home): conteúdo principal em Markdown.
+
+## Interfaces para agentes
+
+- [MCP Server Card](https://app.bebaorange.com/.well-known/mcp/server-card.json): identidade e conexão do servidor MCP Orange.
+- Endpoint MCP: https://api-app.bebaorange.com/mcp (somente leitura; informações públicas e localização de páginas).
+- WebMCP: a página inicial registra ferramentas no navegador quando a API WebMCP está disponível.
+
+## Atendimento
+
+- E-mail: [oi@orange.com.br](mailto:oi@orange.com.br)
+- Conta: https://app.bebaorange.com/cadastro
+- Login: https://app.bebaorange.com/login
+
+## Informações importantes
+
+- Os valores mostrados nos planos são fictícios e servem apenas como exemplo visual.
+- Os depoimentos na página inicial são fictícios e servem para demonstrar o layout.
+- Informações finais de ingredientes, conservação, composição nutricional e regras de devolução serão publicadas quando estiverem confirmadas.
