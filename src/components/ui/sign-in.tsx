@@ -18,6 +18,9 @@ export function SignInPage({ initialMfaRequired = false, oauthError = "" }: { in
   const [notice, setNotice] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [mfaRequired, setMfaRequired] = useState(initialMfaRequired);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
+  const [resendingVerification, setResendingVerification] = useState(false);
+  const [resendNotice, setResendNotice] = useState("");
 
   useEffect(() => {
     if (oauthError === "cancelled") setNotice("O acesso com o provedor foi cancelado.");
@@ -27,20 +30,24 @@ export function SignInPage({ initialMfaRequired = false, oauthError = "" }: { in
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setNotice("");
+    setResendNotice("");
+    setUnverifiedEmail("");
     setSubmitting(true);
     const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
 
     try {
       const response = await apiFetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: formData.get("email"), password: formData.get("password") }),
+        body: JSON.stringify({ email, password: formData.get("password") }),
       });
 
       if (!response.ok) {
         const payload = await response.json().catch(() => null) as { message?: string | string[] } | null;
         const message = Array.isArray(payload?.message) ? payload.message[0] : payload?.message;
         setNotice(message ?? "Não foi possível entrar. Confira os dados e tente novamente.");
+        if (response.status === 403) setUnverifiedEmail(email);
         return;
       }
 
@@ -55,6 +62,28 @@ export function SignInPage({ initialMfaRequired = false, oauthError = "" }: { in
       setNotice("Não foi possível conectar ao servidor. Tente novamente em instantes.");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function resendVerification() {
+    if (!unverifiedEmail) return;
+    setResendingVerification(true);
+    setResendNotice("");
+    try {
+      const response = await apiFetch("/api/auth/email/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: unverifiedEmail }),
+      });
+      const payload = await response.json().catch(() => null) as { message?: string } | null;
+      setResendNotice(payload?.message
+        ?? (response.ok
+          ? "Solicitação enviada. Confira sua caixa de entrada."
+          : "Não foi possível reenviar o e-mail agora."));
+    } catch {
+      setResendNotice("Não foi possível conectar ao servidor. Tente novamente.");
+    } finally {
+      setResendingVerification(false);
     }
   }
 
@@ -111,6 +140,14 @@ export function SignInPage({ initialMfaRequired = false, oauthError = "" }: { in
             <a className={styles.forgotLink} href="/esqueci-senha">Esqueci minha senha</a>
             <button type="submit" className={styles.loginButton} disabled={submitting}>{submitting ? "Entrando…" : "Entrar"}</button>
             {notice && <p className={styles.error} role="alert">{notice}</p>}
+            {unverifiedEmail && (
+              <>
+                <button type="button" className={styles.secondaryButton} onClick={resendVerification} disabled={resendingVerification}>
+                  {resendingVerification ? "Enviando…" : "Reenviar e-mail de confirmação"}
+                </button>
+                {resendNotice && <p className={styles.message} role="status">{resendNotice}</p>}
+              </>
+            )}
           </form>
           </>
         )}

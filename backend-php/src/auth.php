@@ -131,34 +131,39 @@ function orange_verify_email(array $body): never
     $db->beginTransaction();
     try {
         $statement = $db->prepare(
-            'SELECT id, userId FROM email_verification_tokens
-             WHERE tokenHash = ? AND usedAt IS NULL AND expiresAt > ? LIMIT 1',
+            'SELECT id, userId, usedAt FROM email_verification_tokens
+             WHERE tokenHash = ? AND expiresAt > ? LIMIT 1',
         );
         $statement->execute([orange_token_hash($token), orange_now()]);
         $record = $statement->fetch();
         if (!$record) {
             orange_fail(401, 'Link de confirmação inválido ou expirado.');
         }
-        $userLock = $db->prepare('SELECT id, email FROM users WHERE id = ? LIMIT 1 FOR UPDATE');
+        $userLock = $db->prepare('SELECT id, email, emailVerified FROM users WHERE id = ? LIMIT 1 FOR UPDATE');
         $userLock->execute([$record['userId']]);
         $user = $userLock->fetch();
         if (!is_array($user)) {
             orange_fail(401, 'Link de confirmação inválido ou expirado.');
         }
-        $updateToken = $db->prepare(
-            'UPDATE email_verification_tokens SET usedAt = ? WHERE id = ? AND usedAt IS NULL AND expiresAt > ?',
-        );
         $now = orange_now();
-        $updateToken->execute([$now, $record['id'], $now]);
-        if ($updateToken->rowCount() !== 1) {
-            orange_fail(401, 'Link de confirmação inválido ou expirado.');
-        }
-        $updateUser = $db->prepare('UPDATE users SET emailVerified = true, updatedAt = ? WHERE id = ?');
-        $updateUser->execute([$now, $record['userId']]);
         $email = strtolower((string) $user['email']);
-        $unsubscribeCheck = $db->prepare('SELECT 1 FROM email_unsubscribes WHERE email = ? LIMIT 1');
-        $unsubscribeCheck->execute([$email]);
-        $welcomeEmailEligible = !$unsubscribeCheck->fetchColumn();
+        $welcomeEmailEligible = false;
+
+        if ($record['usedAt'] === null && (int) $user['emailVerified'] !== 1) {
+            $updateToken = $db->prepare(
+                'UPDATE email_verification_tokens SET usedAt = ? WHERE id = ? AND usedAt IS NULL AND expiresAt > ?',
+            );
+            $updateToken->execute([$now, $record['id'], $now]);
+            if ($updateToken->rowCount() !== 1) {
+                orange_fail(401, 'Link de confirmação inválido ou expirado.');
+            }
+            $updateUser = $db->prepare('UPDATE users SET emailVerified = true, updatedAt = ? WHERE id = ?');
+            $updateUser->execute([$now, $record['userId']]);
+
+            $unsubscribeCheck = $db->prepare('SELECT 1 FROM email_unsubscribes WHERE email = ? LIMIT 1');
+            $unsubscribeCheck->execute([$email]);
+            $welcomeEmailEligible = !$unsubscribeCheck->fetchColumn();
+        }
         $db->commit();
     } catch (Throwable $error) {
         if ($db->inTransaction()) {
