@@ -507,3 +507,8 @@
   .admin-sidebar, .metric-card, .admin-plan-card, .app-shell .primary-button, .breakdown-track > span, .bar { transition: none; }
   .customer-refresh-spinning { animation: none; }
 }
+
+/* Retorno do envio de comunicados ao lado dos botões */
+.broadcast-feedback-ok { color: var(--admin-orange); font-weight: 600; }
+.broadcast-feedback-error { color: var(--admin-danger); font-weight: 600; }
+.broadcast-feedback-hint { color: var(--admin-orange); }

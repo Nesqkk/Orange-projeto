@@ -162,6 +162,13 @@ export function AdminBroadcasts() {
 
   const ready = draftReady(draft);
   const audience = listing?.audience ?? 0;
+  // Explica, ao lado dos botões, por que eles estão desativados: antes o clique simplesmente não fazia nada.
+  const blockedReason = !listing ? "Carregando os destinatários…"
+    : draft.subject.trim().length < 3 ? "Escreva um assunto com pelo menos 3 letras."
+    : !ready ? "Preencha o título (2+ letras) e a mensagem (10+ letras), ou cole um layout HTML."
+    : listing.smtpReady === false ? "O envio de e-mail não está configurado no servidor."
+    : audience === 0 ? "Ainda não há clientes com e-mail confirmado para receber. O teste para você funciona normalmente."
+    : "";
   const progress = sending && sending.total ? Math.round(((sending.sent + sending.failed) / sending.total) * 100) : 0;
 
   return <>
@@ -200,9 +207,11 @@ export function AdminBroadcasts() {
         <div className="field"><label htmlFor="bc-custom-html">Layout HTML personalizado (opcional)</label><textarea id="bc-custom-html" value={draft.customHtml} onChange={(event) => set("customHtml", event.target.value)} maxLength={30000} rows={12} spellCheck={false} placeholder={'Cole aqui o HTML completo do e-mail. Exemplo: <h1>Olá, {{nome}}!</h1><p>{{mensagem}}</p>'} /><small className="field-hint">Quando preenchido, este HTML substitui o layout visual acima. Variáveis disponíveis: <code>{"{{nome}}"}</code>, <code>{"{{assunto}}"}</code>, <code>{"{{titulo}}"}</code>, <code>{"{{destaque}}"}</code>, <code>{"{{mensagem}}"}</code>, <code>{"{{imagem}}"}</code>, <code>{"{{cta_label}}"}</code>, <code>{"{{cta_url}}"}</code> e <code>{"{{unsubscribe}}"}</code>. O link de descadastro é incluído automaticamente. {draft.customHtml.length}/30000</small></div>
 
         <div className="broadcast-actions">
-          <button type="button" className="secondary-button" onClick={() => void sendTest()} disabled={!ready || busy || !!sending}><Send size={15} /> Enviar teste para mim</button>
+          <button type="button" className="secondary-button" onClick={() => void sendTest()} disabled={!ready || busy || !!sending}><Send size={15} /> {busy ? "Enviando…" : "Enviar teste para mim"}</button>
           <button type="submit" className="primary-button" disabled={!ready || busy || !!sending || !audience || listing?.smtpReady === false}><Send size={16} /> Enviar para {audience} {audience === 1 ? "cliente" : "clientes"}</button>
         </div>
+        {(error || notice) && <p className={`form-footnote ${error ? "broadcast-feedback-error" : "broadcast-feedback-ok"}`} role={error ? "alert" : "status"}>{error || notice}</p>}
+        {!error && !notice && blockedReason && <p className="form-footnote broadcast-feedback-hint">{blockedReason}</p>}
         <p className="form-footnote">Recebem os clientes com e-mail confirmado{listing?.unsubscribed ? `, menos ${listing.unsubscribed} que pediram para sair da lista` : ""}. Todo e-mail sai com o link de descadastro.</p>
       </form>
 
