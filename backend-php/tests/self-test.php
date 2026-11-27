@@ -40,7 +40,7 @@ $confirmationHtml = orange_verification_email_html(
     'https://app.bebaorange.com/confirmar-email?token=abc&next=home',
 );
 check(str_contains($confirmationHtml, '&lt;Ana&gt;'), 'Email name was not escaped.');
-check(str_contains($confirmationHtml, 'Confirmar meu e-mail'), 'Confirmation email CTA is missing.');
+check(str_contains($confirmationHtml, 'Confirmar e ativar cupom'), 'Confirmation email CTA is missing.');
 check(str_contains($confirmationHtml, 'orange-logo.png'), 'Email logo URL is missing.');
 check(str_contains($confirmationHtml, 'token=abc&amp;next=home'), 'Confirmation link was not escaped.');
 check(!str_contains($confirmationHtml, '/redefinir-senha'), 'Confirmation email included a password-reset link.');
@@ -50,7 +50,7 @@ $resetHtml = orange_password_reset_email_html(
     'Ana',
     'https://app.bebaorange.com/redefinir-senha?token=reset-token',
 );
-check(str_contains($resetHtml, 'Redefinir minha senha'), 'Password-reset email CTA is missing.');
+check(str_contains($resetHtml, 'Criar senha nova'), 'Password-reset email CTA is missing.');
 check(str_contains($resetHtml, '30 minutos'), 'Password-reset expiry is missing.');
 check(!str_contains($resetHtml, '/confirmar-email'), 'Password-reset email included a verification link.');
 
