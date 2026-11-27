@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo_Black, DM_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@/components/analytics";
 
 const archivoBlack = Archivo_Black({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-archivo-black" });
 const dmMono = DM_Mono({ weight: ["400", "500"], subsets: ["latin"], display: "swap", variable: "--font-dm-mono" });
@@ -83,7 +84,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       </head>
-      <body>{children}</body>
+      <body>{children}<Analytics /></body>
     </html>
   );
 }

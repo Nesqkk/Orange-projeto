@@ -6,6 +6,7 @@ API para o plano compartilhado Hostinger, sem runtime Node.js. Requer PHP 8.3+ c
 
 1. Crie um banco novo e vazio no hPanel; não use os bancos existentes do Orange sem autorização, revisão dos dados e backup verificado.
 2. Importe `schema.sql` nesse banco vazio. A API não cria nem altera tabelas automaticamente.
+   Para uma instalação existente, execute também `migrations/2026-11-26-comunicados-html.sql` para habilitar layouts HTML personalizados nos comunicados.
 3. Publique o conteúdo de `backend-php/` como website PHP em `api-app.bebaorange.com`.
 4. Copie `config.example.php` para `orange-config.php` no diretório acima de `public_html` e preencha-o somente no servidor. Nunca coloque o arquivo privado em `public_html` ou no repositório.
 5. Execute `php seed-admin.php` uma única vez com `SEED_ADMIN_USERS` no arquivo privado. O comando recusa sobrescrever uma conta existente; remova as credenciais de administrador depois do seed.
@@ -18,6 +19,7 @@ API para o plano compartilhado Hostinger, sem runtime Node.js. Requer PHP 8.3+ c
 - MFA TOTP e códigos de recuperação de uso único.
 - Clientes e planos no painel administrativo.
 - Chamados e mensagens da central do cliente/equipe.
+- Comunicados por e-mail com layouts prontos ou HTML personalizado, prévia, envio de teste e link automático de descadastro.
 - Ferramentas MCP públicas, servidas em `https://api-app.bebaorange.com/mcp`.
 - CORS com credenciais limitado à origem HTTPS definida por `FRONTEND_URL`.
 - Limitação de tentativas armazenada no próprio banco.

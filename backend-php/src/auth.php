@@ -171,17 +171,29 @@ function orange_verify_email(array $body): never
         }
         throw $error;
     }
-    $welcomeEmailSent = null;
-    if ($welcomeEmailEligible) {
-        try {
-            orange_send_welcome_email($email, orange_unsubscribe_url($email));
-            $welcomeEmailSent = true;
-        } catch (Throwable $error) {
-            error_log('Orange welcome email delivery failed: ' . get_class($error));
-            $welcomeEmailSent = false;
-        }
-    }
+    $welcomeEmailSent = $welcomeEmailEligible ? orange_deliver_welcome_email($email) : null;
     orange_json(200, ['ok' => true, 'welcomeEmailSent' => $welcomeEmailSent]);
+}
+
+/** Envia as boas-vindas (cupom de 10%) sem derrubar o fluxo se o SMTP falhar. */
+function orange_deliver_welcome_email(string $email): bool
+{
+    try {
+        orange_send_welcome_email($email, orange_unsubscribe_url($email));
+        return true;
+    } catch (Throwable $error) {
+        error_log('Orange welcome email delivery failed: ' . get_class($error));
+        return false;
+    }
+}
+
+/** Boas-vindas para conta que acabou de ser criada ou confirmada fora do link (ex.: Google). */
+function orange_welcome_new_account(string $email): ?bool
+{
+    $email = strtolower($email);
+    $unsubscribed = orange_db()->prepare('SELECT 1 FROM email_unsubscribes WHERE email = ? LIMIT 1');
+    $unsubscribed->execute([$email]);
+    return $unsubscribed->fetchColumn() ? null : orange_deliver_welcome_email($email);
 }
 
 function orange_resend_verification(array $body): never
@@ -227,11 +239,18 @@ function orange_resend_verification(array $body): never
                 ]);
                 $name = is_string($user['name'] ?? null) ? $user['name'] : '';
                 $site = orange_origin();
-                orange_send_verification(
-                    $email,
-                    $name,
-                    $site . '/confirmar-email?token=' . rawurlencode($token),
-                );
+                try {
+                    orange_send_verification(
+                        $email,
+                        $name,
+                        $site . '/confirmar-email?token=' . rawurlencode($token),
+                    );
+                } catch (OrangeApiError $mailError) {
+                    throw $mailError;
+                } catch (Throwable $mailError) {
+                    error_log('Orange resend: e-mail de confirmação não enviado: ' . $mailError->getMessage());
+                    throw new OrangeApiError(503, 'Não conseguimos enviar o e-mail de confirmação agora. Tente novamente em alguns minutos.');
+                }
             }
         }
         $db->commit();

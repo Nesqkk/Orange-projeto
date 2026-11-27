@@ -200,6 +200,7 @@ function orange_google_user(array $identity): array
         if ($user !== null && $user['role'] !== 'CUSTOMER') {
             throw new RuntimeException('Staff account cannot use Google login.');
         }
+        $isNewOrJustVerified = $user === null || (int) $user['emailVerified'] !== 1;
         if ($user === null) {
             $user = [
                 'id' => orange_uuid(),
@@ -231,6 +232,8 @@ function orange_google_user(array $identity): array
         );
         $link->execute([orange_uuid(), $identity['subject'], $identity['email'], $user['id']]);
         $db->commit();
+        // Conta nova ou confirmada agora pelo Google: recebe as mesmas boas-vindas do link de e-mail.
+        $user['welcomeEmailEligible'] = $isNewOrJustVerified;
         return $user;
     } catch (Throwable $error) {
         if ($db->inTransaction()) {
@@ -270,6 +273,10 @@ function orange_google_callback(): never
     } catch (Throwable $failure) {
         error_log('Orange OAuth: login Google recusado (' . get_class($failure) . ').');
         orange_oauth_fail_redirect();
+    }
+
+    if (!empty($user['welcomeEmailEligible'])) {
+        orange_welcome_new_account((string) $user['email']);
     }
 
     $previous = orange_cookie('orange_session');

@@ -241,61 +241,56 @@ function orange_email_html(
     $safeLink = orange_email_escape($link);
 
     $template = <<<'HTML'
-<!doctype html>
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
 <meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
 <title>{{headline}}</title>
+<!--[if !mso]><!--><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet"><!--<![endif]-->
+<!--[if mso]><style>h1,p,td,a,span,strong{font-family:Arial,sans-serif!important}</style><![endif]-->
+<style>
+  body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+  table,td{mso-table-lspace:0;mso-table-rspace:0}
+  img{-ms-interpolation-mode:bicubic;border:0;outline:none;text-decoration:none}
+  body{margin:0!important;padding:0!important;width:100%!important}
+  a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important}
+  @media only screen and (max-width:560px){
+    .px{padding-left:24px!important;padding-right:24px!important}
+    .big{font-size:52px!important;line-height:56px!important}
+    .btn{display:block!important;text-align:center!important}
+  }
+</style>
 </head>
-<body style="margin:0;padding:0;background:#f5f4f1;font-family:Arial,Helvetica,sans-serif;color:#151515;-webkit-font-smoothing:antialiased">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0">{{preheader}}</div>
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f5f4f1">
-<tr><td align="center" style="padding:42px 16px">
-<table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 12px 50px rgba(20,20,20,.07)">
-<tr><td style="padding:18px 34px;border-bottom:1px solid #eee">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
-<td valign="middle"><table role="presentation" cellspacing="0" cellpadding="0"><tr>
-<td valign="middle"><img src="{{logo}}" width="48" height="48" alt="Logo Bebaorange" style="display:block;width:48px;height:48px;border-radius:12px"></td>
-<td valign="middle" style="padding-left:11px;font-size:20px;font-weight:800;letter-spacing:-.8px;color:#151515">bebaorange<span style="color:#ff642d">.</span></td>
-</tr></table></td>
-<td align="right" valign="middle" style="font-size:10px;letter-spacing:1.8px;color:#888;font-weight:bold">CONTA &amp; SEGURANÇA</td>
-</tr></table>
+<body style="margin:0;padding:0;background-color:#F4EFE7;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#1A1410;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#F4EFE7;opacity:0;">{{preheader}}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F4EFE7;">
+<tr><td align="center" style="padding:32px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background-color:#FFFFFF;border-radius:20px;overflow:hidden;">
+<tr><td class="px" bgcolor="#FF6A00" style="background-color:#FF6A00;padding:24px 32px;">
+<a href="https://bebaorange.com" target="_blank" style="text-decoration:none;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+<td valign="middle" style="padding-right:10px;"><img src="{{logo}}" width="30" height="30" alt="" style="display:block;width:30px;height:30px;border:0;"></td>
+<td valign="middle" style="font-family:'Fraunces',Georgia,serif;font-weight:900;font-size:28px;line-height:32px;color:#1A1410;">Orange.</td>
+</tr></table></a>
 </td></tr>
-<tr><td style="padding:38px 34px 35px;background:#ff642d">
-<table role="presentation" width="100%"><tr>
-<td valign="top">
-<div style="font-size:11px;letter-spacing:2px;font-weight:bold;color:#451b0e">BEM-VINDO(A) À LARANJA</div>
-<h1 style="font-size:42px;line-height:1.02;letter-spacing:-2px;margin:16px 0 12px;color:#171310">{{headline}}<br><span style="color:#fff">{{highlight}}</span></h1>
-<p style="font-size:15px;line-height:1.6;color:#3b2116;margin:0;max-width:390px">{{heroDescription}}</p>
-</td>
-<td width="90" align="right" valign="top"><div style="width:70px;height:70px;line-height:70px;text-align:center;border:1px solid rgba(0,0,0,.22);border-radius:50%;font-size:32px;color:#171310">↗</div></td>
-</tr></table>
+<tr><td class="px" align="center" style="padding:28px 32px 0 32px;"><img src="https://api-app.bebaorange.com/email/gomo-acenando.png" width="150" height="150" alt="Gominho acenando" style="display:block;width:150px;height:150px;border:0;margin:0 auto;"></td></tr>
+<tr><td class="px" style="padding:12px 32px 8px 32px;">
+<h1 style="margin:0 0 16px 0;font-family:'Fraunces',Georgia,serif;font-weight:900;font-size:28px;line-height:34px;color:#1A1410;">{{headline}}<span style="color:#FF6A00;">{{highlight}}</span></h1>
+<p style="margin:0 0 14px 0;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#4A433C;">{{greeting}} {{heroDescription}} {{bodyText}}</p>
+<p style="margin:24px 0;"><a class="btn" href="{{link}}" target="_blank" style="display:inline-block;background-color:#FF6A00;color:#1A1410;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;line-height:20px;text-decoration:none;padding:14px 26px;border-radius:999px;">{{button}}</a></p>
+<p style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#8A8178;">{{notice}}</p>
+<p style="margin:0 0 18px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8178;word-break:break-all;">Se o botão não abrir, copie este link no navegador:<br><a href="{{link}}" target="_blank" style="color:#E35A00;text-decoration:underline;">{{link}}</a></p>
+<p style="margin:0 0 28px 0;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#4A433C;">Equipe Orange</p>
 </td></tr>
-<tr><td style="padding:32px 34px 16px">
-<p style="font-size:15px;line-height:1.7;color:#454545;margin:0 0 22px">{{greeting}} {{bodyText}}</p>
-<table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td bgcolor="#171717" style="border-radius:8px">
-<a href="{{link}}" style="display:inline-block;padding:16px 23px;color:#fff;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:.2px">{{button}} <span style="color:#ff642d">→</span></a>
-</td></tr></table>
-<p style="font-size:12px;color:#888;line-height:1.6;margin:17px 0 0">{{notice}}</p>
-</td></tr>
-<tr><td style="padding:18px 34px 32px">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f6f5f2;border-radius:12px"><tr><td style="padding:20px 22px">
-<div style="font-size:14px;font-weight:bold;color:#171717">Precisa de ajuda?</div>
-<div style="font-size:12px;line-height:1.5;color:#777;margin-top:5px">Nossa equipe pode ajudar com sua conta.</div>
-</td></tr></table>
-<p style="font-size:11px;line-height:1.6;color:#999;margin:18px 0 0">Se o botão não abrir, copie este link no navegador:<br><span style="color:#d94a1b;word-break:break-all">{{link}}</span></p>
-</td></tr>
-<tr><td style="background:#171717;padding:22px 34px">
-<table role="presentation" width="100%"><tr>
-<td style="font-size:12px;line-height:1.6;color:#aaa">Dúvidas? <a href="mailto:ajuda@bebaorange.com" style="color:#ff8054;text-decoration:none">Fale com nosso time</a></td>
-<td align="right" style="font-size:11px;color:#777">© {{year}} Bebaorange</td>
-</tr></table>
+<tr><td class="px" style="padding:20px 32px;border-top:1px solid #EFE7DB;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8178;">Orange &middot; Brasília, DF &middot; &copy; {{year}}<br>Mensagem automática de conta e segurança.</td></tr>
+</table>
 </td></tr>
 </table>
-<p style="font-size:10px;color:#aaa;margin:17px 0 0">Mensagem automática de conta e segurança.</p>
-</td></tr></table>
 </body>
 </html>
 HTML;
@@ -317,18 +312,85 @@ HTML;
 
 function orange_verification_email_html(string $origin, string $name, string $link): string
 {
-    return orange_email_html(
-        $origin,
-        $name,
-        'Confirme seu e-mail para ativar sua conta Bebaorange.',
-        'Seu próximo passo começa',
-        'aqui.',
-        'Confirme seu e-mail para ativar sua conta e aproveitar tudo o que preparamos para você.',
-        'Recebemos seu pedido de cadastro. Para confirmar que este e-mail é seu, toque no botão:',
-        'Confirmar meu e-mail',
-        $link,
-        'Este link é válido por 24 horas. Se você não iniciou este cadastro, ignore esta mensagem.',
-    );
+    $safeName = trim($name);
+    $greeting = $safeName === ''
+        ? 'Olá.'
+        : 'Olá, <strong style="color:#1A1410">' . orange_email_escape($safeName) . '</strong>.';
+
+    $template = <<<'HTML'
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Obrigado por se cadastrar na Orange</title>
+<!--[if !mso]><!--><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet"><!--<![endif]-->
+<!--[if mso]><style>h1,p,td,a,span,strong{font-family:Arial,sans-serif!important}</style><![endif]-->
+<style>
+  body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+  table,td{mso-table-lspace:0;mso-table-rspace:0}
+  img{-ms-interpolation-mode:bicubic;border:0;outline:none;text-decoration:none}
+  body{margin:0!important;padding:0!important;width:100%!important}
+  a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important}
+  @media only screen and (max-width:560px){
+    .px{padding-left:24px!important;padding-right:24px!important}
+    .big{font-size:52px!important;line-height:56px!important}
+    .btn{display:block!important;text-align:center!important}
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#F4EFE7;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#1A1410;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#F4EFE7;opacity:0;">{{preheader}}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F4EFE7;">
+<tr><td align="center" style="padding:32px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background-color:#FFFFFF;border-radius:20px;overflow:hidden;">
+<tr><td class="px" bgcolor="#FF6A00" style="background-color:#FF6A00;padding:24px 32px;">
+<a href="https://bebaorange.com" target="_blank" style="text-decoration:none;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+<td valign="middle" style="padding-right:10px;"><img src="{{logo}}" width="30" height="30" alt="" style="display:block;width:30px;height:30px;border:0;"></td>
+<td valign="middle" style="font-family:'Fraunces',Georgia,serif;font-weight:900;font-size:28px;line-height:32px;color:#1A1410;">Orange.</td>
+</tr></table></a>
+</td></tr>
+<tr><td class="px" style="padding:32px 32px 8px 32px;">
+<h1 style="margin:0 0 16px 0;font-family:'Fraunces',Georgia,serif;font-weight:900;font-size:28px;line-height:34px;color:#1A1410;">Obrigado por se cadastrar<span style="color:#FF6A00;">!</span></h1>
+<p style="margin:0 0 14px 0;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#4A433C;">{{greeting}} Que bom ter você com a gente. A Orange tá quase saindo e você vai ser dos primeiros a saber de tudo: lançamento, máquinas novas e novidades.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFF4E6" style="background-color:#FFF4E6;border:2px dashed #FFB27A;border-radius:16px;margin:10px 0 6px 0;">
+<tr><td align="center" style="padding:24px 20px 20px 20px;">
+<p style="margin:0 0 4px 0;font-family:'Courier New',Courier,monospace;font-size:12px;line-height:16px;letter-spacing:3px;text-transform:uppercase;color:#7A4A26;">Seu cupom de boas-vindas</p>
+<p class="big" style="margin:0;font-family:'Fraunces',Georgia,serif;font-weight:900;font-size:64px;line-height:68px;color:#FF6A00;">10% OFF</p>
+<p style="margin:4px 0 0 0;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:#1A1410;">na sua primeira compra</p>
+<p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#7A4A26;">Ativa quando você confirmar o seu e-mail. O código chega no dia do lançamento.</p>
+</td></tr></table>
+</td></tr>
+<tr><td class="px" style="padding:16px 32px 0 32px;">
+<p style="margin:0 0 14px 0;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#4A433C;">Pra ativar o seu cupom, falta só confirmar que este e-mail é seu:</p>
+<p style="margin:24px 0;"><a class="btn" href="{{link}}" target="_blank" style="display:inline-block;background-color:#FF6A00;color:#1A1410;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;line-height:20px;text-decoration:none;padding:14px 26px;border-radius:999px;">{{button}}</a></p>
+<p style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#8A8178;">{{notice}}</p>
+<p style="margin:0 0 18px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8178;word-break:break-all;">Se o botão não abrir, copie este link no navegador:<br><a href="{{link}}" target="_blank" style="color:#E35A00;text-decoration:underline;">{{link}}</a></p>
+<p style="margin:0 0 14px 0;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#4A433C;">Equipe Orange</p>
+<a href="https://bebaorange.com" target="_blank" style="display:block;margin:10px 0 32px 0;"><img src="https://api-app.bebaorange.com/email/poster-boas-vindas.jpg" width="456" alt="Orange: seu próximo gole começa aqui." style="display:block;width:100%;max-width:456px;height:auto;border-radius:16px;border:0;"></a>
+</td></tr>
+<tr><td class="px" style="padding:20px 32px;border-top:1px solid #EFE7DB;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8A8178;">Orange &middot; Brasília, DF &middot; &copy; {{year}}<br>Mensagem automática de conta e segurança.</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
+HTML;
+
+    return strtr($template, [
+        '{{preheader}}' => 'Confirme seu e-mail pra ativar seus 10% OFF.',
+        '{{logo}}' => orange_email_escape(rtrim($origin, '/') . '/orange-logo.png'),
+        '{{greeting}}' => $greeting,
+        '{{link}}' => orange_email_escape($link),
+        '{{button}}' => 'Confirmar e ativar cupom',
+        '{{notice}}' => 'O link vale por 24 horas. Se não foi você que se cadastrou, é só ignorar este e-mail.',
+        '{{year}}' => gmdate('Y'),
+    ]);
 }
 
 function orange_password_reset_email_html(string $origin, string $name, string $link): string
@@ -336,14 +398,14 @@ function orange_password_reset_email_html(string $origin, string $name, string $
     return orange_email_html(
         $origin,
         $name,
-        'Redefina com segurança a senha da sua conta Bebaorange.',
-        'Sua conta fica segura',
-        'com você.',
-        'Recupere o acesso à sua conta de forma segura.',
-        'Recebemos um pedido para redefinir a senha da sua conta. Se foi você, use o botão abaixo:',
-        'Redefinir minha senha',
+        'Use o link pra criar uma senha nova.',
+        'Bora trocar sua senha',
+        '?',
+        'Recebemos um pedido pra redefinir a senha da sua conta Orange.',
+        'Se foi você, é só tocar no botão:',
+        'Criar senha nova',
         $link,
-        'Este link é válido por 30 minutos. Se você não pediu a redefinição, ignore esta mensagem; sua senha não será alterada.',
+        'O link vale por 30 minutos. Se não foi você, ignore este e-mail: sua senha continua a mesma.',
     );
 }
 
@@ -426,11 +488,11 @@ Garantido pelo seu cadastro. O código chega no seu e-mail no dia do lançamento
 </td></tr>
 <tr><td class="px" style="padding:44px 40px 0 40px;">
 <p style="margin:0 0 10px 0;font-family:'Courier New',Courier,monospace;font-size:12px;line-height:16px;letter-spacing:3px;text-transform:uppercase;color:#FF8A1F;">O que vem aí</p>
-<p style="margin:0 0 18px 0;font-family:'Fraunces',Georgia,serif;font-size:17px;line-height:26px;color:#E9DFD2;">Suco de laranja 100% natural com colágeno, feito em Brasília. Você retira a sua garrafa gelada nas máquinas automáticas da Orange, sem fila e sem atendente, na hora que quiser.</p>
+<p style="margin:0 0 18px 0;font-family:'Fraunces',Georgia,serif;font-size:17px;line-height:26px;color:#E9DFD2;">Suco de laranja com colágeno, feito em Brasília. Você retira a sua garrafa gelada nas máquinas automáticas da Orange, sem fila e sem atendente, na hora que quiser.</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 <td class="chip" width="33%" style="padding:0 4px 0 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="border:1px solid #3A2A1E;border-radius:999px;padding:10px 8px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:16px;color:#FFF4E6;"><span style="color:#FF6A00;">&#9679;</span>&nbsp;Laranja espremida</td></tr></table></td>
 <td class="chip" width="33%" style="padding:0 2px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="border:1px solid #3A2A1E;border-radius:999px;padding:10px 8px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:16px;color:#FFF4E6;"><span style="color:#FF6A00;">&#9679;</span>&nbsp;Com colágeno</td></tr></table></td>
-<td class="chip" width="33%" style="padding:0 0 0 4px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="border:1px solid #3A2A1E;border-radius:999px;padding:10px 8px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:16px;color:#FFF4E6;"><span style="color:#FF6A00;">&#9679;</span>&nbsp;Sem conservante</td></tr></table></td>
+<td class="chip" width="33%" style="padding:0 0 0 4px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="border:1px solid #3A2A1E;border-radius:999px;padding:10px 8px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:16px;color:#FFF4E6;"><span style="color:#FF6A00;">&#9679;</span>&nbsp;Garrafa retornável</td></tr></table></td>
 </tr></table>
 </td></tr>
 <tr><td class="px" align="left" style="padding:36px 40px 0 40px;">
