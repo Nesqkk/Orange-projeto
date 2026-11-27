@@ -426,11 +426,11 @@ Garantido pelo seu cadastro. O código chega no seu e-mail no dia do lançamento
 </td></tr>
 <tr><td class="px" style="padding:44px 40px 0 40px;">
 <p style="margin:0 0 10px 0;font-family:'Courier New',Courier,monospace;font-size:12px;line-height:16px;letter-spacing:3px;text-transform:uppercase;color:#FF8A1F;">O que vem aí</p>
-<p style="margin:0 0 18px 0;font-family:'Fraunces',Georgia,serif;font-size:17px;line-height:26px;color:#E9DFD2;">Suco de laranja 100% natural com colágeno, feito em Brasília. Você retira a sua garrafa gelada nas máquinas automáticas da Orange, sem fila e sem atendente, na hora que quiser.</p>
+<p style="margin:0 0 18px 0;font-family:'Fraunces',Georgia,serif;font-size:17px;line-height:26px;color:#E9DFD2;">Suco de laranja com colágeno, feito em Brasília. Você retira a sua garrafa gelada nas máquinas automáticas da Orange, sem fila e sem atendente, na hora que quiser.</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 <td class="chip" width="33%" style="padding:0 4px 0 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="border:1px solid #3A2A1E;border-radius:999px;padding:10px 8px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:16px;color:#FFF4E6;"><span style="color:#FF6A00;">&#9679;</span>&nbsp;Laranja espremida</td></tr></table></td>
 <td class="chip" width="33%" style="padding:0 2px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="border:1px solid #3A2A1E;border-radius:999px;padding:10px 8px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:16px;color:#FFF4E6;"><span style="color:#FF6A00;">&#9679;</span>&nbsp;Com colágeno</td></tr></table></td>
-<td class="chip" width="33%" style="padding:0 0 0 4px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="border:1px solid #3A2A1E;border-radius:999px;padding:10px 8px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:16px;color:#FFF4E6;"><span style="color:#FF6A00;">&#9679;</span>&nbsp;Sem conservante</td></tr></table></td>
+<td class="chip" width="33%" style="padding:0 0 0 4px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="border:1px solid #3A2A1E;border-radius:999px;padding:10px 8px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:16px;color:#FFF4E6;"><span style="color:#FF6A00;">&#9679;</span>&nbsp;Garrafa retornável</td></tr></table></td>
 </tr></table>
 </td></tr>
 <tr><td class="px" align="left" style="padding:36px 40px 0 40px;">

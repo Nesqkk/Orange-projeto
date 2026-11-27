@@ -30,6 +30,7 @@ function orange_broadcast_input(array $body): array
         'imageUrl' => $field('imageUrl'),
         'ctaLabel' => $field('ctaLabel'),
         'ctaUrl' => $field('ctaUrl'),
+        'customHtml' => isset($body['customHtml']) && is_string($body['customHtml']) ? trim($body['customHtml']) : '',
     ];
     $length = static fn(string $value): int => orange_text_length($value);
     if ($length($input['subject']) < 3 || $length($input['subject']) > 160) {
@@ -41,13 +42,14 @@ function orange_broadcast_input(array $body): array
     if (!in_array($input['layout'], ORANGE_BROADCAST_LAYOUTS, true)) {
         orange_fail(400, 'Escolha um layout válido.');
     }
-    if ($length($input['headline']) < 2 || $length($input['headline']) > 120) {
+    $hasCustomHtml = $input['customHtml'] !== '';
+    if ($length($input['headline']) > 120 || (!$hasCustomHtml && $length($input['headline']) < 2)) {
         orange_fail(400, 'O título precisa ter entre 2 e 120 caracteres.');
     }
     if ($length($input['highlight']) > 80) {
         orange_fail(400, 'O destaque pode ter no máximo 80 caracteres.');
     }
-    if ($length($input['body']) < 10 || $length($input['body']) > 8000) {
+    if ($length($input['body']) > 8000 || (!$hasCustomHtml && $length($input['body']) < 10)) {
         orange_fail(400, 'A mensagem precisa ter entre 10 e 8000 caracteres.');
     }
     foreach (['imageUrl' => 'imagem', 'ctaUrl' => 'botão'] as $key => $label) {
@@ -57,6 +59,9 @@ function orange_broadcast_input(array $body): array
     }
     if ($length($input['ctaLabel']) > 60) {
         orange_fail(400, 'O texto do botão pode ter no máximo 60 caracteres.');
+    }
+    if ($length($input['customHtml']) > 30000) {
+        orange_fail(400, 'O layout HTML pode ter no máximo 30000 caracteres.');
     }
     if (($input['ctaLabel'] === '') !== ($input['ctaUrl'] === '')) {
         orange_fail(400, 'Para usar o botão, preencha o texto e o link.');
@@ -90,12 +95,48 @@ function orange_first_name(?string $name): string
     return $name === '' ? '' : (preg_split('/\s+/u', $name)[0] ?? '');
 }
 
-/** Monta o HTML do comunicado. Todo texto vindo do painel é escapado; só {{nome}} é personalizado. */
+/** Monta o HTML do comunicado, escapando valores dinâmicos no template personalizado. */
 function orange_broadcast_html(array $b, string $name, string $unsubscribeUrl): string
 {
     $e = 'orange_email_escape';
     $first = orange_first_name($name);
     $personalize = static fn(string $value): string => str_replace(['{{nome}}', '{{ nome }}'], $first !== '' ? $first : 'cliente', $value);
+    if (($b['customHtml'] ?? '') !== '') {
+        $bodyHtml = '';
+        foreach (preg_split("/\n{2,}/", $personalize($b['body'])) ?: [] as $paragraph) {
+            $bodyHtml .= '<p>' . nl2br($e(trim($paragraph)), false) . '</p>';
+        }
+        $image = $b['imageUrl'] !== ''
+            ? '<img src="' . $e($b['imageUrl']) . '" alt="" style="display:block;max-width:100%;height:auto">'
+            : '';
+        $button = $b['ctaUrl'] !== ''
+            ? '<a href="' . $e($b['ctaUrl']) . '">' . $e($b['ctaLabel']) . '</a>'
+            : '';
+        $unsubscribe = '<a href="' . $e($unsubscribeUrl) . '">Não quero mais receber comunicados</a>';
+        $html = str_replace(
+            ['{{nome}}', '{{ nome }}', '{{assunto}}', '{{titulo}}', '{{destaque}}', '{{mensagem}}', '{{imagem}}', '{{cta_label}}', '{{cta_url}}', '{{cta}}', '{{unsubscribe}}'],
+            [$e($first !== '' ? $first : 'cliente'), $e($first !== '' ? $first : 'cliente'), $e($b['subject']), $e($personalize($b['headline'])), $e($personalize($b['highlight'])), $bodyHtml, $image, $e($b['ctaLabel']), $e($b['ctaUrl']), $button, $unsubscribe],
+            $b['customHtml'],
+        );
+        $footer = !str_contains($b['customHtml'], '{{unsubscribe}}')
+            ? '<p style="font:12px/1.6 Arial,sans-serif;color:#777;text-align:center;margin:24px 0">' . $unsubscribe . '</p>'
+            : '';
+        if (preg_match('/<\/body\s*>/i', $html) === 1) {
+            return preg_replace_callback('/<\/body\s*>/i', static function (array $match) use ($footer): string {
+                return $footer . $match[0];
+            }, $html, 1) ?? $html;
+        }
+        if (preg_match('/<\/html\s*>/i', $html) === 1) {
+            return preg_replace_callback('/<\/html\s*>/i', static function (array $match) use ($footer): string {
+                return $footer . $match[0];
+            }, $html, 1) ?? $html;
+        }
+        if (preg_match('/<(?:!doctype|html)\b/i', $html) === 1) {
+            return $html . $footer;
+        }
+        return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'
+            . $e($b['subject']) . '</title></head><body>' . $html . $footer . '</body></html>';
+    }
     $category = ORANGE_BROADCAST_CATEGORIES[$b['category']];
     $origin = orange_origin();
     $logo = $e($origin . '/orange-logo-96.png');
@@ -161,6 +202,17 @@ function orange_broadcast_text(array $b, string $name, string $unsubscribeUrl): 
 {
     $first = orange_first_name($name);
     $personalize = static fn(string $value): string => str_replace(['{{nome}}', '{{ nome }}'], $first !== '' ? $first : 'cliente', $value);
+    if (($b['customHtml'] ?? '') !== '') {
+        $plain = strip_tags(str_replace(['<br>', '<br/>', '<br />', '</p>', '</div>'], "\n", $b['customHtml']));
+        $plain = html_entity_decode($plain, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $plain = str_replace(
+            ['{{nome}}', '{{ nome }}', '{{assunto}}', '{{titulo}}', '{{destaque}}', '{{mensagem}}', '{{imagem}}', '{{cta_label}}', '{{cta_url}}', '{{cta}}', '{{unsubscribe}}'],
+            [$first !== '' ? $first : 'cliente', $first !== '' ? $first : 'cliente', $b['subject'], $personalize($b['headline']), $personalize($b['highlight']), $personalize($b['body']), $b['imageUrl'], $b['ctaLabel'], $b['ctaUrl'], $b['ctaLabel'] . ' ' . $b['ctaUrl'], $unsubscribeUrl],
+            $plain,
+        );
+        if (!str_contains($b['customHtml'], '{{unsubscribe}}')) $plain .= "\n\nPara não receber mais comunicados: " . $unsubscribeUrl;
+        return trim(preg_replace("/\n{3,}/", "\n\n", $plain) ?? $plain);
+    }
     $lines = [
         ($first !== '' ? "Olá, {$first}." : 'Olá.'),
         '',
@@ -391,13 +443,13 @@ function orange_broadcast_route(string $method, string $path): bool
         $db->beginTransaction();
         try {
             $insert = $db->prepare(
-                'INSERT INTO broadcasts (id, subject, category, layout, headline, highlight, body, imageUrl, ctaLabel, ctaUrl, status, total, createdBy, createdAt)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, \'SENDING\', 0, ?, ?)',
+                'INSERT INTO broadcasts (id, subject, category, layout, headline, highlight, body, imageUrl, ctaLabel, ctaUrl, customHtml, status, total, createdBy, createdAt)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, \'SENDING\', 0, ?, ?)',
             );
             $insert->execute([
                 $id, $input['subject'], $input['category'], $input['layout'], $input['headline'],
                 $input['highlight'] ?: null, $input['body'], $input['imageUrl'] ?: null,
-                $input['ctaLabel'] ?: null, $input['ctaUrl'] ?: null, $admin['id'], orange_now(),
+                $input['ctaLabel'] ?: null, $input['ctaUrl'] ?: null, $input['customHtml'] ?: null, $admin['id'], orange_now(),
             ]);
             $recipients = $db->prepare(
                 'INSERT INTO broadcast_recipients (broadcastId, userId, email, name)

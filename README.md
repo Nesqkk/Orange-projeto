@@ -148,6 +148,24 @@ npm run build
 
 Os arquivos publicados serão gerados no diretório `out/`.
 
+### Medição (Meta Pixel e GA4)
+
+O site carrega o Pixel da Meta e o Google Analytics 4 só quando os IDs existem no momento do build. Como o frontend é export estático, as variáveis **não** são lidas do painel da Hostinger: elas precisam estar definidas na máquina ou no CI que roda `npm run build`, e o `out/` gerado já sai com os IDs.
+
+```powershell
+$env:NEXT_PUBLIC_BACKEND_URL = "https://api-app.bebaorange.com"
+$env:NEXT_PUBLIC_META_PIXEL_ID = "123456789012345"
+$env:NEXT_PUBLIC_GA_ID = "G-XXXXXXXXXX"
+npm run build
+```
+
+Também dá para gravar esses valores em `.env.production.local` (ignorado pelo Git; modelo em `.env.example`). Sem os IDs, nenhum script externo é carregado.
+
+- Código: `src/lib/analytics.ts` (funções) e `src/components/analytics.tsx` (carrega os scripts com `next/script` em `lazyOnload` e envia PageView em toda troca de rota).
+- `cadastro`: disparado quando o cadastro por e-mail conclui. Meta `CompleteRegistration`, GA4 `sign_up`.
+- `compra`: `trackCompra({ value, transactionId })` (ou `track("compra", ...)`), moeda padrão BRL. Meta `Purchase`, GA4 `purchase`. Ainda não é chamado em lugar nenhum: chame na página de obrigado do checkout, só com pagamento aprovado, passando o ID do pedido para não contar duas vezes.
+- No GA4, em Fluxos de dados > Medição otimizada, desligue "Mudanças de página com base em eventos do histórico do navegador": o site já envia `page_view` em cada navegação e a opção ligada contaria em dobro.
+
 ### API PHP
 
 ```powershell
@@ -327,7 +345,7 @@ O MCP atual expõe somente informações públicas e não concede acesso adminis
 
 1. Execute o build do frontend.
 2. Publique todo o conteúdo de `out/` no domínio público.
-3. Configure `NEXT_PUBLIC_BACKEND_URL` com a origem da API.
+3. Configure `NEXT_PUBLIC_BACKEND_URL` com a origem da API e, para medição, `NEXT_PUBLIC_META_PIXEL_ID` e `NEXT_PUBLIC_GA_ID` (todas antes do build; veja "Medição").
 4. Valide HTTPS, redirecionamento e arquivos públicos.
 
 ### API PHP

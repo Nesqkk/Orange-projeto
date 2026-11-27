@@ -1,0 +1,48 @@
+<!doctype html>
+<!--
+  Fonte do pôster do e-mail de boas-vindas (poster-boas-vindas.jpg, 1040x1300).
+  Renderizar: chrome --headless=new --hide-scrollbars --force-device-scale-factor=1
+    --window-size=1040,1300 --screenshot=poster.png poster-boas-vindas.html
+  e converter para JPG. A foto do topo (foto-topo.jpg) é o recorte 0..548px do pôster anterior.
+  Textos revisados para a ANVISA: o suco tem colágeno, então nada de "100% suco/laranja",
+  "suco natural", "sem açúcar", "sem água", "sem conservante" nem alegações de saúde.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Pôster boas-vindas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,900,0..100&family=DM+Sans:wght@400;500;700&display=block" rel="stylesheet">
+<style>
+  :root { --laranja: #FE6A00; --tinta: #1A1411; --marrom: #4A1E0A; --destaque: #FF9550; --creme: #FFF4E6; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1040px; height: 1300px; overflow: hidden; background: var(--laranja); }
+  body { position: relative; font-family: "DM Sans", Arial, sans-serif; color: var(--tinta); }
+  .foto { position: absolute; inset: 0 0 auto 0; width: 1040px; height: 548px; background: linear-gradient(to bottom, rgba(254,106,0,0) 0, rgba(254,106,0,0) 470px, rgba(254,106,0,.75) 525px, #FE6A00 548px), url("foto-topo.jpg") top left / 1040px 548px no-repeat; }
+  .conteudo { position: absolute; left: 72px; right: 72px; top: 556px; }
+  .eyebrow { font-weight: 700; font-size: 21px; letter-spacing: 5px; color: var(--marrom); text-transform: uppercase; }
+  h1 { margin-top: 26px; font-family: "Fraunces", Georgia, serif; font-weight: 900; font-variation-settings: "opsz" 72, "SOFT" 100; font-size: 98px; line-height: 1.02; letter-spacing: -2px; white-space: nowrap; color: var(--tinta); }
+  .sub { margin-top: 28px; font-size: 29px; line-height: 1.5; color: var(--tinta); max-width: 860px; }
+  .cards { position: absolute; left: 72px; right: 72px; top: 995px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 19px; }
+  .card { display: flex; flex-direction: column; height: 168px; background: var(--tinta); border-radius: 26px; padding: 30px 24px 0; color: var(--creme); }
+  .card b { display: flex; align-items: center; flex: 0 0 46px; height: 46px; overflow: hidden; font-family: "Fraunces", Georgia, serif; font-weight: 900; font-variation-settings: "opsz" 72, "SOFT" 100; font-size: 42px; line-height: 46px; color: var(--destaque); }
+  .card b svg { display: block; width: 38px; height: 38px; }
+  .card p { margin-top: 14px; font-size: 21px; line-height: 1.38; font-weight: 500; }
+  .rodape { position: absolute; left: 72px; right: 72px; top: 1232px; display: flex; justify-content: space-between; font-weight: 700; font-size: 21px; letter-spacing: 4px; color: var(--marrom); }
+</style>
+</head>
+<body>
+  <div class="foto" role="img" aria-label="Mulher correndo no parque bebendo suco Orange"></div>
+  <div class="conteudo">
+    <div class="eyebrow">BEM-VINDO À ORANGE</div>
+    <h1>Seu próximo gole<br>começa aqui.</h1>
+    <p class="sub">Laranja espremida no dia, com colágeno. Entregue gelada em Brasília, numa garrafa que volta pra você.</p>
+  </div>
+  <div class="cards">
+    <div class="card"><b>Colágeno</b><p>na receita, junto com a laranja espremida</p></div>
+    <div class="card"><b>15%</b><p>de cashback nas compras</p></div>
+    <div class="card"><b><svg viewBox="0 0 24 24" fill="none" stroke="#FF9550" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 3v5h5"/></svg></b><p>garrafa retornável, nada vira lixo</p></div>
+  </div>
+  <div class="rodape"><span>BEBAORANGE.COM</span><span>BRASÍLIA · DF</span></div>
+</body>
+</html>

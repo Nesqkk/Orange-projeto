@@ -470,7 +470,8 @@ p { text-wrap: pretty; }
 }
 .hero h1 { max-width: 650px; }
 
-.hero-description { font-size: 17px; line-height: 1.7; color: var(--muted); max-width: 440px; }
+.hero-description { font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 440px; text-wrap: balance; }
+.eyebrow-sep { opacity: .5; }
 .hero-actions { display: flex; align-items: center; gap: 27px; margin-top: 32px; }
 
 .hero-visual { height: 570px; position: relative; display: grid; place-items: center; isolation: isolate; perspective: 1000px; align-self: center; }
@@ -508,14 +509,20 @@ p { text-wrap: pretty; }
 .garrafa-3d { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; }
 .garrafa-3d canvas { flex: 1 1 auto; min-height: 0; width: 100%; display: block; touch-action: pan-y pinch-zoom; outline: none; }
 .garrafa-3d:has(> canvas:focus-visible) { outline: 2px solid #FF8A1F; outline-offset: -2px; border-radius: 12px; }
-.garrafa-controles { flex: none; padding-top: 18px; display: flex; flex-direction: column; align-items: center; gap: .4rem; }
+.garrafa-controles { flex: none; padding-top: 14px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+/* dica e "de novo" na mesma linha, pequenas e apagadas: servem a garrafa, não competem com o título */
+.garrafa-ajuda { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; column-gap: 4px; font-size: .8rem; }
+.garrafa-ajuda .garrafa-dica, .garrafa-ajuda .garrafa-repetir { font-size: inherit; }
+.garrafa-ajuda .garrafa-dica.some { display: none; }   /* sem dica, o link fica sozinho no centro */
+.garrafa-ajuda .garrafa-dica:not(.some)::after { content: "·"; margin-left: .55rem; opacity: .6; }
+.hero .eyebrow { flex-wrap: wrap; row-gap: 4px; }   /* "· 100% natural" desce de linha no celular em vez de estourar */
 .garrafa-dica { font-size: .85rem; letter-spacing: .02em; color: #8A847C; pointer-events: none; transition: opacity .6s ease; }
 .garrafa-dica.some { opacity: 0; }
 .garrafa-repetir { background: transparent; border: 0; padding: .4rem .8rem; min-height: 36px; font-size: .85rem; color: #8A847C; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .garrafa-repetir:hover { color: #FF8A1F; }
 
 /* Seletor PET / Vidro / As duas: pílula segmentada com rádios nativos */
-.garrafa-escolha { position: relative; flex: none; z-index: 2; margin: 0 0 8px; padding: 0; border: 0; min-width: 0; }
+.garrafa-escolha { position: relative; flex: none; z-index: 2; margin: 0; padding: 0; border: 0; min-width: 0; }
 .garrafa-escolha .trilho { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid rgba(255, 244, 230, .12); border-radius: 999px; background: rgba(5, 5, 5, .5); backdrop-filter: blur(6px); }
 .garrafa-escolha label { position: relative; display: grid; place-items: center; min-width: 44px; min-height: 40px; padding: 0 1rem; border-radius: 999px; font-weight: 600; font-size: .9rem; color: #A39C94; cursor: pointer; user-select: none; touch-action: manipulation; transition: background-color .25s ease, color .25s ease, transform .25s ease; }
 .garrafa-escolha input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }

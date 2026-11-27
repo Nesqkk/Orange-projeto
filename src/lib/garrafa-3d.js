@@ -920,6 +920,9 @@ export function iniciarVitrine(canvas, opcoes = {}) {
 
   // ---------- laço
   let ultimo = agoraMs(), visivel = true, calmo = false, pulo = false, fundo = false;
+  // relógio da entrada parado enquanto nada é desenhado (aba em segundo plano, fora da tela, ainda carregando):
+  // assim a garrafa enche quando a pessoa de fato a vê, sem precisar do botão "Ver o enchimento de novo"
+  let pausaDesde = null;
   const boca = new THREE.Vector3(), eixoSombra = new THREE.Vector3(), camAnt = new THREE.Vector3();
   function passoGarrafa(g, dt, agora) {
     const { st, liq, U, tipo } = g, T = tipo.T;
@@ -994,9 +997,13 @@ export function iniciarVitrine(canvas, opcoes = {}) {
     const desenhar = tique(ts);
     ritmo.desenhouAntes = false;
     if (!desenhar) return;
-    if (!visivel || !pronto) { ritmo.ultimoQuadro = 0; return; }
+    if (!visivel || !pronto) { ritmo.ultimoQuadro = 0; if (pronto && pausaDesde === null) pausaDesde = agoraMs(); return; }
     if (calmo && (pulo = !pulo)) { ritmo.pulou = true; return; }
     const agora = agoraMs();
+    if (pausaDesde !== null) {
+      const parado = agora - pausaDesde; pausaDesde = null;
+      for (const g of lista) if (g.entrou && (agora - g.inicio) / 1000 < g.tipo.T.tampaFim) g.inicio += parado;
+    }
     const dt = Math.min((agora - ultimo) / 1000, 1 / 30); ultimo = agora;
     uTempo.value = agora / 1000;
     const trocando = passoTroca(agora);
@@ -1096,6 +1103,8 @@ export function iniciarVitrine(canvas, opcoes = {}) {
     roPosicao = new ResizeObserver(() => { medir(); medirFocos(); }); roPosicao.observe(canvas);
     if (pai) roPosicao.observe(pai);
     io = new IntersectionObserver(([e]) => { visivel = e.isIntersecting; }); io.observe(canvas);
+    // aba escondida: o navegador para os quadros sem passar pelo teste de visível, então marca a pausa aqui
+    document.addEventListener('visibilitychange', () => { if (document.hidden && pronto && pausaDesde === null) pausaDesde = agoraMs(); }, sinal);
     canvas.addEventListener('webglcontextrestored', () => { sujo = true; }, sinal);
     renderer.setAnimationLoop(quadroAnimado);
     prontoPromessa = arrancar();
@@ -1128,6 +1137,7 @@ export function iniciarVitrine(canvas, opcoes = {}) {
     if (modo === 'ambas') criarFocos();
     ultimo = agoraMs();
     pronto = true; avisarCarregou = true; sujo = true;
+    pausaDesde = agora;   // a entrada conta a partir do 1º quadro realmente desenhado
     // os bytes da outra garrafa já vêm agora, sem pressa (só rede); montar e compilar fica para depois da entrada
     for (const g of lista) if (!g.bytes) { g.urgente ??= false; ocioso(() => { if (!destruido) obterBytes(g); }, 2000); }
   }

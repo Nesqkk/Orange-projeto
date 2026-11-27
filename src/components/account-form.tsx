@@ -106,6 +106,7 @@ export function AccountForm({ mode, token = "" }: { mode: Mode; token?: string }
       if (mode === "register") {
         setNotice("Conta criada! Enviamos um link de confirmação para seu e-mail. Confirme o endereço antes de entrar.");
         setCanResendVerification(true);
+        window.dispatchEvent(new CustomEvent("orange:cadastro", { detail: { method: "email" } }));
       }
       if (mode === "reset") {
         setNotice("Senha atualizada. Entre com sua nova senha.");

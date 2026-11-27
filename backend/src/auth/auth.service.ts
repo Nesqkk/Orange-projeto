@@ -20,7 +20,7 @@ const MFA_CHALLENGE_TTL_MS = 5 * 60 * 1000;
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
 const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 
-export type UserIdentity = { id: string; email: string; role: 'ADMIN' | 'CUSTOMER'; name?: string | null; mfaEnabled: boolean };
+export type UserIdentity = { id: string; email: string; role: 'ADMIN' | 'CUSTOMER'; name?: string | null; mfaEnabled: boolean; mfaSetupRequired: boolean };
 export type AdminIdentity = { id: string; email: string; role: 'ADMIN' };
 
 function hashToken(token: string) {
@@ -70,8 +70,8 @@ function decryptSecret(value: string) {
   }
 }
 
-function identity(user: { id: string; email: string; role: string; name?: string | null; mfaEnabled: boolean }): UserIdentity {
-  return { id: user.id, email: user.email, role: user.role as UserIdentity['role'], name: user.name, mfaEnabled: user.mfaEnabled };
+function identity(user: { id: string; email: string; role: string; name?: string | null; mfaEnabled: boolean }, mfaSetupRequired = false): UserIdentity {
+  return { id: user.id, email: user.email, role: user.role as UserIdentity['role'], name: user.name, mfaEnabled: user.mfaEnabled, mfaSetupRequired };
 }
 
 @Injectable()
@@ -151,21 +151,33 @@ export class AuthService {
         });
         return customer;
       });
-      return this.finishLogin(user);
+      if (user.mfaEnabled) return this.finishLogin(user);
+      const login = await this.createSession(user);
+      return {
+        ...login,
+        mfaSetupRequired: provider === 'GOOGLE',
+      };
     } catch (error) {
       if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
         const linked = await this.prisma.oAuthAccount.findUnique({
           where: { provider_subject: { provider, subject: identityClaims.subject } },
           include: { user: true },
         });
-        if (linked?.user.role === 'CUSTOMER') return this.finishLogin(linked.user);
+        if (linked?.user.role === 'CUSTOMER') {
+          if (linked.user.mfaEnabled) return this.finishLogin(linked.user);
+          const login = await this.createSession(linked.user);
+          return { ...login, mfaSetupRequired: provider === 'GOOGLE' };
+        }
         throw new ConflictException('Não foi possível vincular esta conta. Tente entrar novamente.');
       }
       throw error;
     }
   }
 
-  private async finishLogin(user: { id: string; email: string; role: string; name?: string | null; mfaEnabled: boolean }) {
+  private async finishLogin(user: { id: string; email: string; role: string; name?: string | null; mfaEnabled: boolean }): Promise<
+    | { mfaRequired: true; challengeToken: string; expiresAt: Date }
+    | { mfaRequired: false; token: string; expiresAt: Date; user: UserIdentity }
+  > {
     if (!user.mfaEnabled) return this.createSession(user);
 
     const token = randomBytes(32).toString('base64url');
@@ -203,12 +215,16 @@ export class AuthService {
   async getUserFromCookie(cookieHeader?: string): Promise<UserIdentity> {
     const token = readSessionToken(cookieHeader);
     if (!token) throw new UnauthorizedException('Sessao invalida ou expirada.');
-    const session = await this.prisma.authSession.findUnique({ where: { tokenHash: hashToken(token) }, include: { user: true } });
+    const session = await this.prisma.authSession.findUnique({
+      where: { tokenHash: hashToken(token) },
+      include: { user: { include: { oauthAccounts: true } } },
+    });
     if (!session || session.expiresAt <= new Date()) {
       if (session) await this.prisma.authSession.delete({ where: { id: session.id } });
       throw new UnauthorizedException('Sessao invalida ou expirada.');
     }
-    return identity(session.user);
+    const hasGoogleAccount = session.user.oauthAccounts.some((account) => account.provider === 'GOOGLE');
+    return identity(session.user, hasGoogleAccount && !session.user.mfaEnabled);
   }
 
   async getAdminFromCookie(cookieHeader?: string): Promise<AdminIdentity> {
@@ -256,6 +272,8 @@ export class AuthService {
   async disableMfa(userId: string, code: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user?.mfaEnabled || !user.mfaSecret) throw new ConflictException('MFA nao esta ativado.');
+    const googleAccount = await this.prisma.oAuthAccount.findFirst({ where: { userId, provider: 'GOOGLE' } });
+    if (googleAccount) throw new ConflictException('Contas vinculadas ao Google devem manter a autenticação em duas etapas.');
     if (!await this.verifyUserMfaCode(user, code, true)) throw new UnauthorizedException('Codigo MFA invalido.');
     await this.prisma.user.update({ where: { id: userId }, data: { mfaEnabled: false, mfaSecret: null, mfaPendingSecret: null, mfaBackupCodes: null } });
     await this.prisma.authChallenge.deleteMany({ where: { userId } });

@@ -200,6 +200,7 @@ function orange_google_user(array $identity): array
         if ($user !== null && $user['role'] !== 'CUSTOMER') {
             throw new RuntimeException('Staff account cannot use Google login.');
         }
+        $isNewOrJustVerified = $user === null || (int) $user['emailVerified'] !== 1;
         if ($user === null) {
             $user = [
                 'id' => orange_uuid(),
@@ -231,6 +232,8 @@ function orange_google_user(array $identity): array
         );
         $link->execute([orange_uuid(), $identity['subject'], $identity['email'], $user['id']]);
         $db->commit();
+        // Conta nova ou confirmada agora pelo Google: recebe as mesmas boas-vindas do link de e-mail.
+        $user['welcomeEmailEligible'] = $isNewOrJustVerified;
         return $user;
     } catch (Throwable $error) {
         if ($db->inTransaction()) {
@@ -272,6 +275,10 @@ function orange_google_callback(): never
         orange_oauth_fail_redirect();
     }
 
+    if (!empty($user['welcomeEmailEligible'])) {
+        orange_welcome_new_account((string) $user['email']);
+    }
+
     $previous = orange_cookie('orange_session');
     if ($previous !== null) {
         $delete = orange_db()->prepare('DELETE FROM auth_sessions WHERE tokenHash = ?');
@@ -283,5 +290,5 @@ function orange_google_callback(): never
         orange_redirect(orange_origin() . '/login/?mfa=1');
     }
     orange_create_session($user);
-    orange_redirect(orange_origin() . '/central-de-operacoes/');
+    orange_redirect(orange_origin() . '/central-de-operacoes/?setup-mfa=1');
 }

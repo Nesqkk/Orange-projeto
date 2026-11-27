@@ -63,23 +63,6 @@ export default function GarrafaHero({ fallback = null }: Props) {
 
   return (
     <div className="garrafa-3d">
-      <fieldset className="garrafa-escolha">
-        <legend className="sr-only">Escolha a garrafa</legend>
-        <div className="trilho">
-          {OPCOES.map((o) => (
-            <label key={o.modo}>
-              <input
-                type="radio"
-                name="garrafa"
-                value={o.url}
-                checked={modo === o.modo}
-                onChange={() => escolher(o.modo)}
-              />
-              {o.rotulo}
-            </label>
-          ))}
-        </div>
-      </fieldset>
       <canvas
         ref={canvasRef}
         role="application"
@@ -87,13 +70,33 @@ export default function GarrafaHero({ fallback = null }: Props) {
         aria-label="Garrafa de suco de laranja Orange sendo enchida e tampada. Arraste ou use as setas para girar."
         tabIndex={0}
       />
+      {/* Todos os controles da garrafa juntos embaixo dela: o seletor e, numa linha discreta, a dica e o "de novo". */}
       <div className="garrafa-controles">
-        <span className={dica ? "garrafa-dica" : "garrafa-dica some"} aria-hidden="true">
-          {modo === "ambas" ? "Arraste uma garrafa para girar" : "Arraste para girar"}
-        </span>
-        <button type="button" className="garrafa-repetir" onClick={() => vitrineRef.current?.reiniciar()}>
-          Ver o enchimento de novo
-        </button>
+        <fieldset className="garrafa-escolha">
+          <legend className="sr-only">Escolha a garrafa</legend>
+          <div className="trilho">
+            {OPCOES.map((o) => (
+              <label key={o.modo}>
+                <input
+                  type="radio"
+                  name="garrafa"
+                  value={o.url}
+                  checked={modo === o.modo}
+                  onChange={() => escolher(o.modo)}
+                />
+                {o.rotulo}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <div className="garrafa-ajuda">
+          <span className={dica ? "garrafa-dica" : "garrafa-dica some"} aria-hidden="true">
+            {modo === "ambas" ? "Arraste uma garrafa para girar" : "Arraste para girar"}
+          </span>
+          <button type="button" className="garrafa-repetir" onClick={() => vitrineRef.current?.reiniciar()}>
+            Ver o enchimento de novo
+          </button>
+        </div>
       </div>
     </div>
   );

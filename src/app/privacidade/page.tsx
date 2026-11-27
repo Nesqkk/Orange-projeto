@@ -22,6 +22,7 @@ export default function PrivacyPage() {
       <section>
         <h2>Cookies e armazenamento no navegador</h2>
         <p>A área de conta usa cookies de sessão HTTP-only para manter o acesso e concluir a verificação MFA. A sessão expira após 12 horas; o desafio MFA expira após 5 minutos. O site também guarda sua preferência de tema no armazenamento local do navegador usando a chave <code>orange-tema</code>.</p>
+        <p>Para medir visitas e saber quais campanhas trazem cadastros e compras, o site pode usar o Pixel da Meta (Facebook/Instagram) e o Google Analytics. Essas ferramentas gravam cookies e identificadores no navegador e enviam à Meta e ao Google dados de navegação, como páginas visitadas, dispositivo e eventos de cadastro ou compra, sem senha nem conteúdo de mensagens. Você pode bloqueá-los nas configurações do navegador ou com extensões de bloqueio, e ajustar anúncios nas configurações da sua conta Meta ou Google.</p>
       </section>
       <section>
         <h2>Pedidos sobre seus dados</h2>

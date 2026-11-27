@@ -311,7 +311,7 @@ export default function Home() {
       {/* Hero enxuto: título, descrição curta e garrafa ilustrativa. */}
       <section className="hero section-shell minimal-hero" id="inicio">
         <div className="hero-copy">
-          <div className="eyebrow"><span className="eyebrow-dot" aria-hidden="true" /> NATURALMENTE FORA DO ÓBVIO</div>
+          <div className="eyebrow"><span className="eyebrow-dot" aria-hidden="true" /> NATURALMENTE FORA DO ÓBVIO <span className="eyebrow-sep" aria-hidden="true">·</span> 100% natural</div>
           <h1>O lado mais <span>vivo</span><br />da sua rotina.</h1>
           <p className="hero-description">Laranja de verdade. Sabor que desperta. Uma experiência feita pra quem quer sentir a diferença em cada gole.</p>
           <div className="hero-actions">
@@ -323,7 +323,6 @@ export default function Home() {
           <div className="visual-orbit orbit-a" aria-hidden="true" />
           <div className="visual-orbit orbit-b" aria-hidden="true" />
           <div className="orange-glow" aria-hidden="true" />
-          <div className="floating-label label-top"><Sparkles size={14} aria-hidden="true" /> 100% natural</div>
           <GarrafaHero fallback={<GarrafaCss />} />
         </div>
       </section>

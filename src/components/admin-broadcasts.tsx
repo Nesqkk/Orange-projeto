@@ -10,7 +10,7 @@ type Status = "SENDING" | "SENT" | "CANCELLED";
 
 interface Draft {
   subject: string; category: Category; layout: Layout; headline: string; highlight: string;
-  body: string; imageUrl: string; ctaLabel: string; ctaUrl: string;
+  body: string; imageUrl: string; ctaLabel: string; ctaUrl: string; customHtml: string;
 }
 
 interface Broadcast {
@@ -38,7 +38,7 @@ const categoryLabel = Object.fromEntries(categories.map((item) => [item.id, item
 
 const emptyDraft: Draft = {
   subject: "", category: "NEWS", layout: "HIGHLIGHT", headline: "", highlight: "",
-  body: "", imageUrl: "", ctaLabel: "", ctaUrl: "",
+  body: "", imageUrl: "", ctaLabel: "", ctaUrl: "", customHtml: "",
 };
 
 async function errorMessage(response: Response) {
@@ -47,7 +47,8 @@ async function errorMessage(response: Response) {
 }
 
 function draftReady(draft: Draft) {
-  return draft.subject.trim().length >= 3 && draft.headline.trim().length >= 2 && draft.body.trim().length >= 10;
+  return draft.subject.trim().length >= 3 && (draft.customHtml.trim().length > 0
+    || (draft.headline.trim().length >= 2 && draft.body.trim().length >= 10));
 }
 
 function dateLabel(value: string) {
@@ -187,15 +188,16 @@ export function AdminBroadcasts() {
 
         <div className="field"><label htmlFor="bc-subject">Assunto do e-mail</label><input id="bc-subject" value={draft.subject} onChange={(event) => set("subject", event.target.value)} maxLength={160} placeholder="Ex.: Chegou o Orange+ Founders Edition" required /></div>
         <div className="form-row">
-          <div className="field"><label htmlFor="bc-headline">Título</label><input id="bc-headline" value={draft.headline} onChange={(event) => set("headline", event.target.value)} maxLength={120} placeholder="Ex.: Uma garrafa nova" required /></div>
+          <div className="field"><label htmlFor="bc-headline">Título{draft.customHtml.trim() && " (opcional)"}</label><input id="bc-headline" value={draft.headline} onChange={(event) => set("headline", event.target.value)} maxLength={120} placeholder="Ex.: Uma garrafa nova" required={!draft.customHtml.trim()} /></div>
           <div className="field"><label htmlFor="bc-highlight">{draft.layout === "OFFER" ? "Valor em destaque" : "Destaque (opcional)"}</label><input id="bc-highlight" value={draft.highlight} onChange={(event) => set("highlight", event.target.value)} maxLength={80} placeholder={draft.layout === "OFFER" ? "Ex.: 20% OFF" : "Ex.: para você."} /></div>
         </div>
-        <div className="field"><label htmlFor="bc-body">Mensagem</label><textarea id="bc-body" value={draft.body} onChange={(event) => set("body", event.target.value)} maxLength={8000} rows={8} placeholder={"Escreva o texto do e-mail.\n\nDeixe uma linha em branco entre os parágrafos."} required /><small className="field-hint">Use <code>{"{{nome}}"}</code> para colocar o primeiro nome do cliente. {draft.body.length}/8000</small></div>
+        <div className="field"><label htmlFor="bc-body">Mensagem{draft.customHtml.trim() && " (opcional)"}</label><textarea id="bc-body" value={draft.body} onChange={(event) => set("body", event.target.value)} maxLength={8000} rows={8} placeholder={"Escreva o texto do e-mail.\n\nDeixe uma linha em branco entre os parágrafos."} required={!draft.customHtml.trim()} /><small className="field-hint">Use <code>{"{{nome}}"}</code> para colocar o primeiro nome do cliente. {draft.body.length}/8000</small></div>
         <div className="field"><label htmlFor="bc-image">Imagem (opcional)</label><input id="bc-image" type="url" value={draft.imageUrl} onChange={(event) => set("imageUrl", event.target.value)} maxLength={500} placeholder="https://app.bebaorange.com/fruta-laranja-1200.webp" /><small className="field-hint">Link público https de uma imagem, com 1200 px de largura de preferência.</small></div>
         <div className="form-row">
           <div className="field"><label htmlFor="bc-cta-label">Texto do botão (opcional)</label><input id="bc-cta-label" value={draft.ctaLabel} onChange={(event) => set("ctaLabel", event.target.value)} maxLength={60} placeholder="Ex.: Conhecer agora" /></div>
           <div className="field"><label htmlFor="bc-cta-url">Link do botão</label><input id="bc-cta-url" type="url" value={draft.ctaUrl} onChange={(event) => set("ctaUrl", event.target.value)} maxLength={500} placeholder="https://app.bebaorange.com" /></div>
         </div>
+        <div className="field"><label htmlFor="bc-custom-html">Layout HTML personalizado (opcional)</label><textarea id="bc-custom-html" value={draft.customHtml} onChange={(event) => set("customHtml", event.target.value)} maxLength={30000} rows={12} spellCheck={false} placeholder={'Cole aqui o HTML completo do e-mail. Exemplo: <h1>Olá, {{nome}}!</h1><p>{{mensagem}}</p>'} /><small className="field-hint">Quando preenchido, este HTML substitui o layout visual acima. Variáveis disponíveis: <code>{"{{nome}}"}</code>, <code>{"{{assunto}}"}</code>, <code>{"{{titulo}}"}</code>, <code>{"{{destaque}}"}</code>, <code>{"{{mensagem}}"}</code>, <code>{"{{imagem}}"}</code>, <code>{"{{cta_label}}"}</code>, <code>{"{{cta_url}}"}</code> e <code>{"{{unsubscribe}}"}</code>. O link de descadastro é incluído automaticamente. {draft.customHtml.length}/30000</small></div>
 
         <div className="broadcast-actions">
           <button type="button" className="secondary-button" onClick={() => void sendTest()} disabled={!ready || busy || !!sending}><Send size={15} /> Enviar teste para mim</button>
