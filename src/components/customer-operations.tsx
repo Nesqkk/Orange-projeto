@@ -23,17 +23,7 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
 }
 
-export function CustomerOperations({
-  email,
-  name,
-  mfaEnabled: initialMfa,
-  mfaSetupRequired: initialMfaSetupRequired = false,
-}: {
-  email: string;
-  name?: string | null;
-  mfaEnabled: boolean;
-  mfaSetupRequired?: boolean;
-}) {
+export function CustomerOperations({ email, name, mfaEnabled: initialMfa }: { email: string; name?: string | null; mfaEnabled: boolean }) {
   const router = useRouter();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedId, setSelectedId] = useState("");
@@ -44,18 +34,11 @@ export function CustomerOperations({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [mfaEnabled, setMfaEnabled] = useState(initialMfa);
-  const [mfaSetupRequired, setMfaSetupRequired] = useState(initialMfaSetupRequired);
   const [mfaSetup, setMfaSetup] = useState<MfaSetup | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
 
   const selected = tickets.find((ticket) => ticket.id === selectedId) ?? null;
-
-  useEffect(() => {
-    if (mfaSetupRequired && !mfaEnabled && !mfaSetup) {
-      void startMfa();
-    }
-  }, [mfaSetupRequired, mfaEnabled]);
 
   async function loadTickets() {
     try {
@@ -73,9 +56,7 @@ export function CustomerOperations({
     }
   }
 
-  useEffect(() => {
-    if (!mfaSetupRequired) void loadTickets();
-  }, [mfaSetupRequired]);
+  useEffect(() => { void loadTickets(); }, []);
 
   async function submitTicket(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -132,7 +113,6 @@ export function CustomerOperations({
       if (!response.ok) throw new Error(await errorMessage(response));
       const result = await response.json() as { enabled: boolean; backupCodes: string[] };
       setMfaEnabled(result.enabled); setBackupCodes(result.backupCodes); setMfaSetup(null); setMfaCode("");
-      setMfaSetupRequired(false);
       setNotice("MFA ativado. Guarde os códigos de recuperação em um local seguro.");
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Não foi possível ativar o MFA."); }
     finally { setBusy(false); }
@@ -153,35 +133,6 @@ export function CustomerOperations({
   async function logout() {
     await apiFetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
     router.replace("/login"); router.refresh();
-  }
-
-  if (mfaSetupRequired && !mfaEnabled) {
-    return (
-      <main className={styles.page}>
-        <header className={styles.topbar}>
-          <div className={styles.brand}><strong>Orange</strong></div>
-          <button type="button" className={styles.logout} onClick={logout}>Sair</button>
-        </header>
-        <section className={`${styles.panel} ${styles.securityPanel}`} style={{ maxWidth: 720, margin: "48px auto" }}>
-          <div className={styles.securityTop}><span className={styles.status} data-status="OPEN">Obrigatória</span><h2>Proteja sua conta com autenticação em duas etapas</h2></div>
-          <p>Contas criadas ou conectadas pelo Google precisam ativar o MFA antes de acessar a Central de Operações.</p>
-          {error && <p className={styles.error} role="alert">{error}</p>}
-          {mfaSetup && <>
-            <p>Adicione esta chave ao seu app autenticador:</p>
-            <div className={styles.secretBox}>{mfaSetup.secret}</div>
-            <p><a href={mfaSetup.otpauthUrl} className={styles.notice}>Abrir no app autenticador compatível</a></p>
-            <form className={styles.securityActions} onSubmit={confirmMfa}>
-              <input className={styles.formInput} aria-label="Código do app autenticador" inputMode="numeric" autoComplete="one-time-code" placeholder="Código de 6 dígitos" value={mfaCode} onChange={(event) => setMfaCode(event.target.value)} minLength={6} maxLength={6} required />
-              <button className={styles.primaryButton} type="submit" disabled={busy}>{busy ? "Verificando…" : "Ativar MFA"}</button>
-            </form>
-          </>}
-          {backupCodes.length > 0 && <>
-            <p>Salve estes códigos agora. Eles só poderão ser usados uma vez.</p>
-            <div className={styles.backupCodes}>{backupCodes.map((code) => <code key={code}>{code}</code>)}</div>
-          </>}
-        </section>
-      </main>
-    );
   }
 
   return (

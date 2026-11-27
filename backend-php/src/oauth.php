@@ -290,5 +290,5 @@ function orange_google_callback(): never
         orange_redirect(orange_origin() . '/login/?mfa=1');
     }
     orange_create_session($user);
-    orange_redirect(orange_origin() . '/central-de-operacoes/?setup-mfa=1');
+    orange_redirect(orange_origin() . '/central-de-operacoes/');
 }

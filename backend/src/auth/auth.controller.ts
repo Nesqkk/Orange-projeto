@@ -139,9 +139,7 @@ export class AuthController {
       response.cookie(SESSION_COOKIE_NAME, login.token, {
         httpOnly: true, secure, sameSite: 'lax', path: '/', expires: login.expiresAt,
       });
-      return response.redirect('mfaSetupRequired' in login && login.mfaSetupRequired
-        ? `${frontendUrl}/central-de-operacoes?setup-mfa=1`
-        : `${frontendUrl}/central-de-operacoes`);
+      return response.redirect(`${frontendUrl}/central-de-operacoes`);
     } catch {
       return redirectToLogin();
     }

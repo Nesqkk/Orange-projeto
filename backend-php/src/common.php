@@ -207,7 +207,6 @@ function orange_identity(array $user): array
         'role' => $user['role'],
         'name' => $user['name'],
         'mfaEnabled' => (bool) $user['mfaEnabled'],
-        'mfaSetupRequired' => (bool) ($user['googleLinked'] ?? 0) && !(bool) $user['mfaEnabled'],
     ];
 }
 
@@ -290,8 +289,7 @@ function orange_auth_user(bool $adminOnly = false): array
         orange_fail(401, 'Sessão inválida ou expirada.');
     }
     $statement = orange_db()->prepare(
-        'SELECT u.id, u.email, u.name, u.role, u.mfaEnabled, s.id AS sessionId, s.expiresAt,
-                EXISTS(SELECT 1 FROM oauth_accounts o WHERE o.userId = u.id AND o.provider = \'GOOGLE\') AS googleLinked
+        'SELECT u.id, u.email, u.name, u.role, u.mfaEnabled, s.id AS sessionId, s.expiresAt
          FROM auth_sessions s JOIN users u ON u.id = s.userId
          WHERE s.tokenHash = ? LIMIT 1',
     );

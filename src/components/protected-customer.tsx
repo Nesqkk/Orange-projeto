@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { CustomerOperations } from "@/components/customer-operations";
 import { apiFetch } from "@/lib/api";
 
-type Customer = { email: string; name?: string | null; role: string; mfaEnabled: boolean; mfaSetupRequired?: boolean };
+type Customer = { email: string; name?: string | null; role: string; mfaEnabled: boolean };
 
 export function ProtectedCustomer() {
   const router = useRouter();
@@ -37,10 +37,5 @@ export function ProtectedCustomer() {
 
   if (error) return <p role="alert">{error}</p>;
   if (!customer) return <main aria-busy="true" />;
-  return <CustomerOperations
-    email={customer.email}
-    name={customer.name}
-    mfaEnabled={customer.mfaEnabled}
-    mfaSetupRequired={customer.mfaSetupRequired === true}
-  />;
+  return <CustomerOperations email={customer.email} name={customer.name} mfaEnabled={customer.mfaEnabled} />;
 }

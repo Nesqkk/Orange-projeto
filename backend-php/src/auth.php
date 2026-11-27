@@ -477,11 +477,6 @@ function orange_disable_mfa(array $user, array $body): never
     if (!$record || !(bool) $record['mfaEnabled'] || empty($record['mfaSecret'])) {
         orange_fail(409, 'MFA não está ativado.');
     }
-    $linked = orange_db()->prepare('SELECT 1 FROM oauth_accounts WHERE userId = ? AND provider = \'GOOGLE\' LIMIT 1');
-    $linked->execute([$user['id']]);
-    if ($linked->fetchColumn() !== false) {
-        orange_fail(409, 'Contas vinculadas ao Google devem manter a autenticação em duas etapas.');
-    }
     if (!orange_verify_mfa($record, $code, true)) {
         orange_fail(401, 'Código MFA inválido.');
     }
